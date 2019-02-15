@@ -491,7 +491,76 @@ def get_head_parser(url, headers):
         print(1)
 
 
-def parser_content(id, seq=None):
+def parser_youji_head_text(id):
+    try:
+        url = 'http://www.mafengwo.cn/i/' + id + '.html'
+        headers = {
+        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36',
+        'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
+        'accept-encoding':'gzip, deflate, br',
+        'accept-language':'zh - CN, zh;q = 0.9',
+        'Cache-Control': 'no-cache',
+        'pragma': 'no-cache',
+        'Upgrade - Insecure - Requests': '1',
+        'Referer': 'http://www.mafengwo.cn/'
+        }
+        contentHead = {}
+        contentText = {}
+        req = requests.get(url, headers=headers)
+        req.encoding = req.apparent_encoding
+        selector = fromstring(req.text)
+        title_img_url = selector.xpath('//div[@class="set_bg _j_load_cover"]/img/@src')[0]
+        contentHead['title_img_url'] = title_img_url
+        content_title = selector.xpath('//div[@class="vi_con"]/h1/text()')[0]
+        contentHead['content_title'] = content_title
+        time = selector.xpath('//div[@class="tarvel_dir_list clearfix"]/ul/li[@class="time"]/text()')[1]
+        day = selector.xpath('//div[@class="tarvel_dir_list clearfix"]/ul/li[@class="day"]/text()')[1]
+        people = selector.xpath('//div[@class="tarvel_dir_list clearfix"]/ul/li[@class="people"]/text()')[1]
+        cost = selector.xpath('//div[@class="tarvel_dir_list clearfix"]/ul/li[@class="cost"]/text()')[1]
+        contentText['time'] = time
+        contentText['day'] = day
+        contentText['people'] = people
+        contentText['cost'] = cost
+        url = 'http://pagelet.mafengwo.cn/note/pagelet/headOperateApi?params={"iid":' + str(id) + '}'
+        headers = {
+        'Host': 'pagelet.mafengwo.cn',
+        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
+        'Cache-Control': 'no-cache',
+        'pragma': 'no-cache',
+        'Upgrade - Insecure - Requests': '1'
+        }
+        req = requests.get(url,headers=headers)
+        head_html = json.loads(req.text)['data']['html']
+        selector = fromstring(head_html)
+        num_ding = selector.xpath('//a[@class="up_act "]/@data-vote')[0]
+        contentHead['num_ding'] = num_ding
+        per_home_url = 'http://www.mafengwo.cn'+selector.xpath('//a[@class="per_pic"]/@href')[0]
+        contentHead['per_home_url']=per_home_url
+        per_pic_url = selector.xpath('//a[@class="per_pic"]/img/@src')[0]
+        contentHead['per_pic_url'] = per_pic_url
+        per_name = selector.xpath('//a[@class="per_name"]/text()')[0].strip().replace('\n','').replace(' ','')
+        contentHead['per_name'] = per_name
+        per_grade= selector.xpath('//a[@class="per_grade"]/@title')[0]
+        contentHead['per_grade'] = per_grade
+        vip = 'true'
+        contentHead['vip'] = vip
+        vip_url =''
+        contentHead['vip_url'] = vip_url
+        vip_img_url = ''
+        contentHead['vip_img_url'] = vip_img_url
+        time = selector.xpath('//div[@class="vc_time"]/span[@class="time"]/text()')[0]
+        contentHead['time']=time
+        view =selector.xpath('//div[@class="vc_time"]/span[2]/text()')[0]
+        contentHead['view']=view
+        vnum_share =selector.xpath('//a[@class="bs_btn"]/span[1]/text()')[0]
+        contentHead['vnum_share']=vnum_share
+        num_collect =selector.xpath('//a[@class="bs_btn _j_do_fav"]/span[1]/text()')[0]
+        contentHead['num_collect']=num_collect
+        return contentHead,contentText
+    except Exception as e:
+        print(e)
+def parser_youji_detail(id, seq=None):
     """
     游记内容页的解析
     :param id:游记的id
