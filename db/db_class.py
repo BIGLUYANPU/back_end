@@ -1,5 +1,5 @@
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import Column, String, Integer, DateTime, BINARY
+from sqlalchemy import Column, String, Integer, DateTime, BINARY, Text,TIMESTAMP
 
 BaseModel = declarative_base()
 
@@ -45,41 +45,51 @@ class UserAccount(BaseModel):
     # status = Column(Integer)
 
 
+class DaKa(BaseModel):
+    __tablename__ = 'daka'
+    id = Column(Integer, primary_key=True)
+    user_id = Column(Integer)
+    num = Column(Integer)
+    update_time = Column(DateTime)
+
+
 class HomeDataImg(BaseModel):
     __tablename__ = 'home_data_img'
     id = Column(Integer, primary_key=True)
-    hot_data = Column(String)
-    hot_img = Column(String)
+    hot_data = Column(Text)
+    hot_img = Column(Text)
     update_time = Column(DateTime)
 
 
 class HomeNewData(BaseModel):
     __tablename__ = 'home_new_data'
     id = Column(Integer, primary_key=True)
-    new_data = Column(String)
-    update_time = Column(DateTime)
+    new_data = Column(Text)
+    update_time = Column(Text)
 
 
-class Content(BaseModel):
-    __tablename__ = 'content'
+class YouJi(BaseModel):
+    __tablename__ = 'youji'
     id = Column(Integer, primary_key=True)
-    content_info = Column(String)
+    content_head = Column(Text)
+    content_text = Column(Text)
+    content_detail = Column(Text)
     update_time = Column(DateTime)
 
 
 class Destination(BaseModel):
     __tablename__ = 'destination'
     id = Column(Integer, primary_key=True)
-    head_img_info = Column(String)
-    hot_poi_info = Column(String)
-    season_recommend = Column(String)
+    head_img_info = Column(Text)
+    hot_poi_info = Column(Text)
+    season_recommend = Column(Text)
     update_time = Column(DateTime)
 
 
 class GongLve(BaseModel):
     __tablename__ = 'gonglve'
     id = Column(Integer, primary_key=True)
-    nav_left = Column(String)
-    nav_right_img = Column(String)
-    content = Column(String)
+    nav_left = Column(Text)
+    nav_right_img = Column(Text)
+    content = Column(Text)
     update_time = Column(DateTime)

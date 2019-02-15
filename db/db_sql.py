@@ -1,6 +1,7 @@
 from db.db_con import *
 from datetime import datetime
 from db.db_class import *
+import time
 
 
 # 查询user表
@@ -188,6 +189,30 @@ def update_user_account(mail_number, password=None, salt=None):
         session.close()
 
 
+def add_daka(user_id):
+    session = get_con()
+    try:
+        update_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
+        daka = DaKa(user_id=user_id, num=1, update_time=update_time)
+        session.add(daka)
+        session.commit()
+    except Exception as e:
+        print(e)
+    finally:
+        session.close()
+
+
+def select_daka(user_id):
+    session = get_con()
+    try:
+        list = session.query(DaKa).filter(DaKa.user_id == user_id).all()
+        return list
+    except Exception as e:
+        print(e)
+    finally:
+        session.close()
+
+
 def add_hot_data_img(hot_data, hot_img):
     """
     首页的热门游记还有头图
@@ -225,7 +250,7 @@ def add_hot_new_data(new_data):
         session.close()
 
 
-def add_content(content):
+def add_youji(content_head, content_text, content_detail):
     """
     游记内容页
     :param content:
@@ -233,8 +258,8 @@ def add_content(content):
     """
     session = get_con()
     try:
-        print(datetime.now())
-        new_content = Content(content_info=content, update_time=datetime.now())
+        new_content = YouJi(content_head=content_head, content_text=content_text, content_detail=content_detail,
+                            update_time=datetime.now())
         session.add(new_content)
         session.commit()
     except Exception as e:
@@ -284,4 +309,4 @@ def add_gong_lve(nav_left, nav_right_img, content):
 
 
 if __name__ == '__main__':
-    update_user(21, {'name': '小红', 'city': '北京'})
+    add_daka(1)

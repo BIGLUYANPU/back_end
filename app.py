@@ -11,7 +11,7 @@ import os
 import redis
 import random
 from db.db_sql import *
-from parser import *
+from .parser import *
 import json
 import pickle
 
@@ -52,6 +52,10 @@ def index():
 
 @app.route('/login_success', methods=['GET'])
 def login_success():
+    """
+    判断是否为登录状态
+    :return:
+    """
     account = session.get('account')
     if account is not None:
         return json.dumps({'status': 200, 'message': '没有登录'}, ensure_ascii=False)
@@ -111,10 +115,49 @@ def user_login():
         json.dumps({'status': 500, 'message': '系统错误'}, ensure_ascii=False)
 
 
+@app.route('/quit', methods=['GET'])
+def user_quit():
+    """
+    用户退出
+    :return:
+    """
+    try:
+        account = session.get('account')
+        session.pop('account')
+        app.logger.info(str(account) + '退出了')
+        return json.dumps({'status': 200, 'message': '退出成功', 'args': 1}, ensure_ascii=False)
+    except Exception as e:
+        app.logger.error('error:' + str(e))
+        return json.dumps({'status': 500, 'message': '退出失败', 'args': 0}, ensure_ascii=False)
+
+
+@app.route('/logout', methods=['GET'])
+def logout():
+    """
+    注销账户
+    :return:
+    """
+    try:
+        account = session.get('account')
+        user = pickle.loads(session.get('user'))
+        # 删除账户
+        user_account_cancel(account)
+        # 删除user
+        user_cancel(user.user_id)
+        # 清除session
+        session.pop(account)
+        session.pop(user)
+        app.logger.info(account + '用户销毁')
+        return json.dumps({'status': 200, 'message': '操作成功', 'args': 1}, ensure_ascii=False)
+    except Exception as e:
+        app.logger.error('error' + str(e))
+        return json.dumps({'status': 200, 'message': '系统错误', 'args': 0}, ensure_ascii=False)
+
+
 @app.route('/mail', methods=['GET'])
 def to_user_send_mail():
     """
-    邮件发送验证码
+    注册,邮件发送验证码
     :return:
     """
     try:
@@ -147,7 +190,7 @@ def to_user_send_mail():
 @app.route('/reset_mail', methods=['GET'])
 def to_user_send_reset_mail():
     """
-    邮件发送验证码
+    重置密码,邮件发送验证码
     :return:
     """
     try:
@@ -304,6 +347,10 @@ def reset_password():
 
 @app.route('/percentage', methods=['GET'])
 def percent():
+    """
+    百分比
+    :return:
+    """
     user = session.get('user')
     if user is None:
         return json.dumps({'status': 401, 'message': '重新登录', 'args': 0}, ensure_ascii=False)
@@ -394,6 +441,10 @@ def option():
 
 @app.route('/user_img_up', methods=['POST'])
 def img_up():
+    """
+    用户上传图片
+    :return:
+    """
     try:
         # 获取图片
         account = session.get('account')
@@ -504,6 +555,10 @@ def user_safe():
 
 @app.route('/user_url', methods=['GET'])
 def user_url():
+    """
+    我的窝
+    :return:
+    """
     try:
         account = session.get('account')
         if account is None:
@@ -540,22 +595,20 @@ def user_wallet():
         return json.dumps({'status': 500, 'message': '系统错误', 'args': 0}, ensure_ascii=False)
 
 
-@app.route('/logout', methods=['GET'])
-def logout():
+@app.route('/daka', methods=['GET'])
+def daka():
+    """
+    打卡
+    :return:
+    """
     try:
-        account = request.values.get('account')
-        user = pickle.loads(session.get(account))
-        # 删除账户
-        user_account_cancel(account)
-        # 删除user
-        user_cancel(user.user_id)
-        # 清除session
-        session.pop(account)
-        app.logger.info(account + '用户销毁')
-        return json.dumps({'status': 200, 'message': '操作成功', 'args': 1}, ensure_ascii=False)
+        user = session.get('user')
+        add_daka(user.id)
+        app.logger.info(str(session.get('account')) + '打卡成功')
+        return json.dumps({'status': 200, 'message': '打卡成功', 'args': 1}, ensure_ascii=False)
     except Exception as e:
-        app.logger.error('error' + str(e))
-        return json.dumps({'status': 200, 'message': '系统错误', 'args': 0}, ensure_ascii=False)
+        app.logger.info(session.get('account') + '打卡失败' + 'error:' + e)
+        return json.dumps({'status': 500, 'message': '打卡失败', 'args': 0}, ensure_ascii=False)
 
 
 @app.route('/home', methods=['GET'])
@@ -602,31 +655,110 @@ def get_home_new():
         return json.dumps({'status': 500, 'message': '系统错误'})
 
 
-@app.route('/content', methods=['GET'])
-def get_content():
+@app.route('/youji', methods=['GET'])
+def get_youji():
     """
     游记内容抓取
+    contentHead 游记的头部
+    contentText 游记开始的出发时间等等信息
+    contentDetail 游记的正文
     id 为游记的id
     :return:
     """
     try:
-        content_id = request.values.get('id')
-        result = []
+        youji_id = request.values.get('id')
+        """
+        游记的头部解析
+        游记的出发时间 人均费用等解析
+        """
+        contentHead, contentText = parser_youji_head_text(youji_id)
+        """
+        游记的正文部分解析
+        """
+        contentDetail = []
         data = ([], None)
         while True:
-            data = parser_content(content_id, data[1])
-            result.extend(data[0])
+            data = parser_youji_detail(youji_id, data[1])
+            contentDetail.extend(data[0])
             if data[1] == '':
                 break
-        print(result)
-        add_content(str(result))
+        print(contentDetail)
         app.logger.info('游记内容抓取')
-        return json.dumps({'status': 200, 'data': result}, ensure_ascii=False)
+        print(len(str(contentHead)))
+        print(len(str(contentText)))
+        print(len(str(contentDetail)))
+        add_youji(str(contentHead), str(contentText), str(contentDetail))
+        return json.dumps(
+            {'status': 200, 'contentHead': contentHead, 'contentText': contentText, 'contentDetail': contentDetail},
+            ensure_ascii=False)
     except Exception as e:
         app.logger.error('error:' + str(e))
         return json.dumps({'status': 500, 'message': '系统错误'})
 
 
+@app.route('/youji_related', methods=['GET'])
+def youji_related():
+    try:
+        id = request.values.get('id')
+        url = 'https://pagelet.mafengwo.cn/note/pagelet/rightMddApi?params={"iid":' + str(id) + '}'
+        headers = {
+            'Host': 'pagelet.mafengwo.cn',
+            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36',
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
+            'Cache-Control': 'no-cache',
+            'pragma': 'no-cache',
+            'Upgrade - Insecure - Requests': '1'
+        }
+        req = requests.get(url=url, headers=headers)
+        html = json.loads(req.text)['data']['html']
+        selector = fromstring(html)
+        mdd = {}
+        title = selector.xpath('//div[@class="relation_mdd"]/a[@class="_j_mdd_stas"]/@title')[0]
+        href = 'http://www.mafengwo.cn' + str(
+            selector.xpath('//div[@class="relation_mdd"]/a[@class="_j_mdd_stas"]/@href')[0])
+        src = selector.xpath('//div[@class="mdd_info"]/a/img/@src')[0]
+        num = selector.xpath('//div[@class="pics_num clearfix"]/strong/text()')[0]
+        mdd['title'] = title
+        mdd['href'] = href
+        mdd['src'] = src
+        mdd['num'] = num
+        mddid = selector.xpath('//div[@class="pics_num clearfix"]/a/@href')[0].split('/')[-1].split('.')[0]
+        url = 'https://pagelet.mafengwo.cn/note/pagelet/relateNoteApi?params={"iid":' + str(
+            id) + ',"mddid":' + mddid + '}'
+        req = requests.get(url=url, headers=headers)
+        html = json.loads(req.text)['data']['html']
+        selector = fromstring(html)
+        li_list_mdd = selector.xpath('//ul[@class="gs_content"]/li')
+        gonglve = []
+        li_index = 1
+        for li in li_list_mdd:
+            key = '1' + str(li_index)
+            title = li.xpath('a[@class="_j_mddrel_gl_item"]/@title')[0]
+            href = 'http://www.mafengwo.cn' + str(li.xpath('a[@class="_j_mddrel_gl_item"]/@href')[0])
+            src = li.xpath('a[@class="_j_mddrel_gl_item"]/img/@src')[0]
+            view = li.xpath('a[@class="_j_mddrel_gl_item"]/span/text()')[0]
+            gonglve.append({'key': key, 'title': title, 'href': href, 'view': view})
+            li_index = li_index + 1
+        url = 'https://pagelet.mafengwo.cn/note/pagelet/recNoteApi?params={"iid":' + str(id) + '}'
+        req = requests.get(url=url, headers=headers)
+        html = json.loads(req.text)['data']['html']
+        print(html)
+        selector = fromstring(html)
+        li_list_youji = selector.xpath('//ul[@class="gs_content"]/li')
+        youji_list = []
+        li_index = 1
+        for li in li_list_youji:
+            key = '2' + str(li_index)
+            title = li.xpath('a[@class="_j_mddrel_gl_item"]/@title')[0]
+            href = 'http://www.mafengwo.cn' + str(li.xpath('a[@class="_j_mddrel_gl_item"]/@href')[0])
+            src = li.xpath('a[@class="_j_mddrel_gl_item"]/img/@src')[0]
+            view = li.xpath('a[@class="_j_mddrel_gl_item"]/span/text()')[0]
+            youji_list.append({'key': key, 'title': title, 'href': href, 'view': view})
+            li_index = li_index + 1
+        return json.dumps({'mdd': mdd, 'gonglve': gonglve, 'youji': youji_list, 'status': 200}, ensure_ascii=False)
+    except Exception as e:
+        app.logger.info('error:'+str(e))
+        return json.dumps({'status':500,'message':'系统错误'},ensure_ascii=False)
 @app.route('/mdd', methods=['GET'])
 def get_destination():
     """
