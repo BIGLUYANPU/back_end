@@ -26,6 +26,26 @@ def select_user(user_id):
     finally:
         session.close()
 
+# 查询user表
+def select_user_by_Id(id):
+    """
+    查询user
+    :param user_id:
+    :return:
+    """
+    # 创建Session:
+    session = get_con()
+    try:
+        # 创建Query查询，filter是where条件，最后调用one()返回唯一行，如果调用all()则返回所有行:
+        result = session.query(User).filter(User.id == id).all()
+        if len(result) == 0:
+            return None
+        else:
+            return result[0]
+    except Exception as e:
+        print(e)
+    finally:
+        session.close()
 
 # user增加数据
 def add_user(user_id, uid=0, name=None, sex=None, city=None, birthday=None, introduction=None, address=None, img=None,
@@ -191,14 +211,32 @@ def update_user_account(mail_number, password=None, salt=None):
 
 
 def add_daka(user_id):
+    """
+
+    :param user_id:user的id
+    :return:
+    """
     session = get_con()
     try:
         # 得到最后一次的打卡时间
-        last_time = select_daka(user_id)[-1].update_time
+        last_daka = select_daka(user_id)[-1]
+        last_time = last_daka.update_time
         update_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
-        daka = DaKa(user_id=user_id, num=1, update_time=update_time)
+        a = parse(update_time)
+        b = parse(str(last_time))
+        sub = (a-b).days
+        days = 1
+        # 连续打卡了
+        if sub <=1:
+            days = last_daka.days+1
+        num = days%7 if days%7!=0 else 7
+        user = select_user_by_Id(user_id)
+        honey = user.honey+num
+        add_user(user.user_id,{'honey':honey})
+        daka = DaKa(user_id=user_id,update_time=update_time,last_time=last_time,days=days)
         session.add(daka)
         session.commit()
+        return num
     except Exception as e:
         print(e)
     finally:
@@ -312,6 +350,7 @@ def add_gong_lve(nav_left, nav_right_img, content):
 
 
 if __name__ == '__main__':
-    a = parse('2018-10-10 12:02:11')
-    b = parse('2018-10-10 12:02:11')
-    print((a-b).days)
+    # a = parse('2018-10-10 12:02:11')
+    # b = parse('2018-10-10 12:02:11')
+    # print((a-b).days)
+    add_daka(1)

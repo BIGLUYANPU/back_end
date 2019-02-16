@@ -49,9 +49,10 @@ class DaKa(BaseModel):
     __tablename__ = 'daka'
     id = Column(Integer, primary_key=True)
     user_id = Column(Integer)
-    num = Column(Integer)
     update_time = Column(DateTime)
     last_time = Column(DateTime)
+    days = Column(Integer)
+    status = Column(Integer)
 
 class HomeDataImg(BaseModel):
     __tablename__ = 'home_data_img'

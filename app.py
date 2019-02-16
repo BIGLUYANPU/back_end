@@ -603,9 +603,9 @@ def daka():
     """
     try:
         user = session.get('user')
-        add_daka(user.id)
+        num = add_daka(user.id)
         app.logger.info(str(session.get('account')) + '打卡成功')
-        return json.dumps({'status': 200, 'message': '打卡成功', 'args': 1}, ensure_ascii=False)
+        return json.dumps({'status': 200, 'message': '打卡成功', 'args': 1,'num':num}, ensure_ascii=False)
     except Exception as e:
         app.logger.info(session.get('account') + '打卡失败' + 'error:' + e)
         return json.dumps({'status': 500, 'message': '打卡失败', 'args': 0}, ensure_ascii=False)
