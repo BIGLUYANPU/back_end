@@ -675,15 +675,15 @@ def get_youji():
         """
         游记的正文部分解析
         """
-        contentDetail = []
+        contentDetail = ''
         data = ([], None)
         while True:
             data = parser_youji_detail(youji_id, data[1])
-            contentDetail.extend(data[0])
+            contentDetail = contentDetail +data[0]
             if data[1] == '':
                 break
         app.logger.info('游记内容抓取')
-        add_youji(str(contentHead), str(contentText), str(contentDetail))
+        add_youji(str(contentHead), str(contentText), contentDetail)
         return json.dumps(
             {'status': 200, 'contentHead': contentHead, 'contentText': contentText, 'contentDetail': contentDetail},
             ensure_ascii=False)

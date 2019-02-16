@@ -580,62 +580,21 @@ def parser_youji_detail(id, seq=None):
         'Referer': 'http://www.mafengwo.cn/'
     }
     req = requests.get(url, headers=headers)
-    result = []
     try:
         req.raise_for_status()
         req.encoding = req.apparent_encoding
         dict_data = json.loads(req.text)['data']
         has_more = dict_data['has_more']
-        html = str(dict_data['html']).replace('\n', '').strip()
-        soup = BeautifulSoup(str(html), 'html.parser')
-        seq = ''
-        for tag in soup.children:
-            # 标题
-            if isinstance(tag, NavigableString) and (tag.string == '' or tag.string == ' '):
-                # print(len(tag.string))
-                continue
-            if tag.attrs['class'][0] == 'article_title':
-                # print(tag.string)
-                result.append({'title': tag.text.strip()})
-                if tag.nextSibling is None and has_more:
-                    seq = tag.attrs['data-seq']
-                continue
-            # 段落
-            # 11635058
-            # p标签中可能存在段落 解析的有问题
-            if tag.attrs['class'][0] == '_j_note_content':
-                p = []
-                for con in tag.children:
-                    if isinstance(con, NavigableString):
-                        if isinstance(con, Comment):
-                            continue
-                        # print(str(con))
-                        if len(str(con)) == 0 or str(con) == '' or str(con) == ' ':
-                            continue
-                        p.append({'p_text': str(con).replace(' ', '')})
-                        continue
-                    if con.name == 'img':
-                        p.append({'p_img': str(con.attrs['src'])})
-                    if str(con)[:3] == '<br':
-                        p.append({'p_br': str('br')})
-                        continue
-                    if con.name == 'a':
-                        p.append({'p_a': str(con.string)})
-                # print(p)
-                result.append({'p': p})
-                if tag.nextSibling is None and has_more:
-                    seq = tag.attrs['data-seq']
-                continue
-            # 图片div
-            if tag.attrs['class'][0] == 'add_pic':
-                selector = etree.HTML(str(tag))
-                src = selector.xpath('//a/img/@data-src')
-                # print(src[0])
-                result.append({'src': src})
-                if tag.nextSibling is None and has_more:
-                    seq = tag.attrs['data-seq']
-                continue
-        return result, seq
+        print(dict_data['html'])
+        html = str(dict_data['html'])
+        soup = BeautifulSoup(html, 'html.parser')
+        index = -1
+        tag = soup.contents[index]
+        while isinstance(tag, NavigableString):
+            index = index -1
+            tag = soup.contents[index]
+        seq = tag.attrs['data-seq'] if has_more==True else ''
+        return html, seq
     except Exception as e:
         print(e)
 
