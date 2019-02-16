@@ -235,8 +235,8 @@ def add_daka(user_id):
         num = days%7 if days%7!=0 else 7
         user = select_user_by_Id(user_id)
         honey = user.honey+num
-        add_user(user.user_id,{'honey':honey})
-        daka = DaKa(user_id=user_id,update_time=update_time,last_time=last_time,days=days)
+        add_user(user.user_id,honey=honey)
+        daka = DaKa(user_id=user_id,update_time=update_time,last_time=last_time,days=days,status=1)
         session.add(daka)
         session.commit()
         return num

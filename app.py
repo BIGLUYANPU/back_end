@@ -57,9 +57,17 @@ def login_success():
     :return:
     """
     account = session.get('account')
-    if account is not None:
-        return json.dumps({'status': 200, 'message': '登录成功'}, ensure_ascii=False)
-    return json.dumps({'status': 401, 'message': '没有登录'}, ensure_ascii=False)
+    user = session.get('user')
+    if user is None or account is None:
+        return json.dumps({'status': 401, 'message': '没有登录'}, ensure_ascii=False)
+    user = pickle.loads(user)
+    update_time = select_daka(user.id)[-1].update_time
+    time_now = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
+    days = (parse(time_now) - parse(str(update_time))).days
+    daka = True
+    if days != 0:
+        daka = False
+    return json.dumps({'status': 200, 'message': '登录成功', 'daka': daka}, ensure_ascii=False)
 
 
 @app.route('/user_login', methods=['POST'])
@@ -237,7 +245,7 @@ def user_register():
         # 验证码
         usercode = data_json.get('code')
         if usermail is None or password is None or name is None or usercode is None:
-            return json.dumps({'status': 400, 'args': 0,'message':'密码或账号不能为空'}, ensure_ascii=False)
+            return json.dumps({'status': 400, 'args': 0, 'message': '密码或账号不能为空'}, ensure_ascii=False)
         if redis_con.get(usermail + 'code') is None:
             app.logger.info(usermail + '验证码失效')
             return json.dumps({'status': 200, 'message': '验证码已经过期', 'args': 0}, ensure_ascii=False)
@@ -262,7 +270,7 @@ def user_register():
             # 用户个人信息存储到session里
             session['user'] = pickle.dumps(select_user(user_account.id))
             app.logger.info(usermail + '注册成功')
-            return json.dumps({'status': 200, 'message': '注册成功','args':1}, ensure_ascii=False)
+            return json.dumps({'status': 200, 'message': '注册成功', 'args': 1}, ensure_ascii=False)
     except Exception as e:
         app.logger.error('error' + str(e))
         return json.dumps({'status': 500, 'message': '系统错误'}, ensure_ascii=False)
@@ -605,7 +613,7 @@ def daka():
         user = pickle.loads(session.get('user'))
         num = add_daka(user.id)
         app.logger.info(str(session.get('account')) + '打卡成功')
-        return json.dumps({'status': 200, 'message': '打卡成功', 'args': 1,'num':num}, ensure_ascii=False)
+        return json.dumps({'status': 200, 'message': '打卡成功', 'args': 1, 'num': num}, ensure_ascii=False)
     except Exception as e:
         app.logger.info(session.get('account') + '打卡失败' + 'error:' + str(e))
         return json.dumps({'status': 500, 'message': '打卡失败', 'args': 0}, ensure_ascii=False)
@@ -679,7 +687,7 @@ def get_youji():
         data = ([], None)
         while True:
             data = parser_youji_detail(youji_id, data[1])
-            contentDetail = contentDetail +data[0]
+            contentDetail = contentDetail + data[0]
             if data[1] == '':
                 break
         app.logger.info('游记内容抓取')
@@ -753,8 +761,10 @@ def youji_related():
             li_index = li_index + 1
         return json.dumps({'mdd': mdd, 'gonglve': gonglve, 'youji': youji_list, 'status': 200}, ensure_ascii=False)
     except Exception as e:
-        app.logger.info('error:'+str(e))
-        return json.dumps({'status':500,'message':'系统错误'},ensure_ascii=False)
+        app.logger.info('error:' + str(e))
+        return json.dumps({'status': 500, 'message': '系统错误'}, ensure_ascii=False)
+
+
 @app.route('/mdd', methods=['GET'])
 def get_destination():
     """
@@ -795,13 +805,15 @@ def get_gong_lve():
         app.logger.info('error:' + str(e))
         return json.dumps({'status': 500, 'message': '系统错误'})
 
-@app.route('/ziyouxing',methods=['GET'])
+
+@app.route('/ziyouxing', methods=['GET'])
 def ziyouxing():
     url = ''
     headers = {}
-    req = requests.get(url = url,headers = headers)
+    req = requests.get(url=url, headers=headers)
     req.encoding = req.apparent_encoding
     html = fromstring(req.text)
-    
+
+
 if __name__ == '__main__':
     app.run()
