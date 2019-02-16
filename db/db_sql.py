@@ -230,7 +230,8 @@ def add_daka(user_id):
             sub = (a-b).days
             # 连续打卡了
             if sub <=1:
-                days = last_daka.days+1
+                if last_daka.days is not None:
+                    days = last_daka.days+1
         num = days%7 if days%7!=0 else 7
         user = select_user_by_Id(user_id)
         honey = user.honey+num
