@@ -802,6 +802,6 @@ def ziyouxing():
     req = requests.get(url = url,headers = headers)
     req.encoding = req.apparent_encoding
     html = fromstring(req.text)
-
+    
 if __name__ == '__main__':
     app.run()

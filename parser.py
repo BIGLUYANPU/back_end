@@ -1,7 +1,7 @@
 from lxml.html import fromstring, tostring
 from lxml import etree
 from bs4 import BeautifulSoup
-from bs4 import NavigableString, Comment
+from bs4 import NavigableString, Comment,Tag
 import requests
 import json
 
@@ -507,16 +507,16 @@ def parser_youji_head_text(id):
         contentHead = {}
         contentText = {}
         req = requests.get(url, headers=headers)
-        req.encoding = req.apparent_encoding
+        req.encoding = 'utf-8'
         selector = fromstring(req.text)
         title_img_url = selector.xpath('//div[@class="set_bg _j_load_cover"]/img/@src')[0]
         contentHead['title_img_url'] = title_img_url
         content_title = selector.xpath('//div[@class="vi_con"]/h1/text()')[0]
         contentHead['content_title'] = content_title
-        time = selector.xpath('//div[@class="tarvel_dir_list clearfix"]/ul/li[@class="time"]/text()')[1]
-        day = selector.xpath('//div[@class="tarvel_dir_list clearfix"]/ul/li[@class="day"]/text()')[1]
-        people = selector.xpath('//div[@class="tarvel_dir_list clearfix"]/ul/li[@class="people"]/text()')[1]
-        cost = selector.xpath('//div[@class="tarvel_dir_list clearfix"]/ul/li[@class="cost"]/text()')[1]
+        time = '' if len(selector.xpath('//div[@class="tarvel_dir_list clearfix"]/ul/li[@class="time"]/text()'))==0 else selector.xpath('//div[@class="tarvel_dir_list clearfix"]/ul/li[@class="time"]/text()')
+        day = '' if len(selector.xpath('//div[@class="tarvel_dir_list clearfix"]/ul/li[@class="day"]/text()'))==0 else selector.xpath('//div[@class="tarvel_dir_list clearfix"]/ul/li[@class="day"]/text()')[1]
+        people = '' if len(selector.xpath('//div[@class="tarvel_dir_list clearfix"]/ul/li[@class="people"]/text()'))==0 else selector.xpath('//div[@class="tarvel_dir_list clearfix"]/ul/li[@class="people"]/text()')[1]
+        cost = '' if len(selector.xpath('//div[@class="tarvel_dir_list clearfix"]/ul/li[@class="cost"]/text()'))==0 else selector.xpath('//div[@class="tarvel_dir_list clearfix"]/ul/li[@class="cost"]/text()')[1]
         contentText['time'] = time
         contentText['day'] = day
         contentText['people'] = people
@@ -585,7 +585,6 @@ def parser_youji_detail(id, seq=None):
         req.encoding = req.apparent_encoding
         dict_data = json.loads(req.text)['data']
         has_more = dict_data['has_more']
-        print(dict_data['html'])
         html = str(dict_data['html'])
         soup = BeautifulSoup(html, 'html.parser')
         index = -1
@@ -594,7 +593,17 @@ def parser_youji_detail(id, seq=None):
             index = index -1
             tag = soup.contents[index]
         seq = tag.attrs['data-seq'] if has_more==True else ''
-        return html, seq
+        for tag in soup.contents:
+            if isinstance(tag, Tag):
+                if tag.attrs['class'][0]=='add_pic':
+                    for div_tag in tag.contents:
+                        if isinstance(div_tag,Tag):
+                            for img_tag in div_tag.contents:
+                                if isinstance(img_tag, Tag):
+                                    img_tag.attrs['src']=img_tag.attrs['data-src']
+                                    break
+                            break
+        return str(soup), seq
     except Exception as e:
         print(e)
 
