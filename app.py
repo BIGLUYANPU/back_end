@@ -54,7 +54,7 @@ def index():
 def login_success():
     """
     判断是否为登录状态
-    :return:
+    :return:daka是True代表今天打卡
     """
     account = session.get('account')
     user = session.get('user')
@@ -741,7 +741,7 @@ def youji_related():
             href = 'http://www.mafengwo.cn' + str(li.xpath('a[@class="_j_mddrel_gl_item"]/@href')[0])
             src = li.xpath('a[@class="_j_mddrel_gl_item"]/img/@src')[0]
             view = li.xpath('a[@class="_j_mddrel_gl_item"]/span/text()')[0]
-            gonglve.append({'key': key, 'title': title, 'href': href, 'view': view})
+            gonglve.append({'key': key, 'title': title, 'href': href, 'view': view,'src':src})
             li_index = li_index + 1
         url = 'https://pagelet.mafengwo.cn/note/pagelet/recNoteApi?params={"iid":' + str(id) + '}'
         req = requests.get(url=url, headers=headers)
@@ -757,7 +757,7 @@ def youji_related():
             href = 'http://www.mafengwo.cn' + str(li.xpath('a[@class="_j_mddrel_gl_item"]/@href')[0])
             src = li.xpath('a[@class="_j_mddrel_gl_item"]/img/@src')[0]
             view = li.xpath('a[@class="_j_mddrel_gl_item"]/span/text()')[0]
-            youji_list.append({'key': key, 'title': title, 'href': href, 'view': view})
+            youji_list.append({'key': key, 'title': title, 'href': href, 'view': view,'src':src})
             li_index = li_index + 1
         return json.dumps({'mdd': mdd, 'gonglve': gonglve, 'youji': youji_list, 'status': 200}, ensure_ascii=False)
     except Exception as e:
@@ -808,12 +808,28 @@ def get_gong_lve():
 
 @app.route('/ziyouxing', methods=['GET'])
 def ziyouxing():
-    url = ''
-    headers = {}
+    id = request.values.get('id')
+    url = 'https://www.mafengwo.cn/gonglve/ziyouxing/'+str(id)+'.html'
+    headers = {
+        'Host': 'www.mafengwo.cn',
+        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
+        'Cache-Control': 'no-cache',
+        'pragma': 'no-cache',
+        'Upgrade - Insecure - Requests': '1'
+    }
     req = requests.get(url=url, headers=headers)
     req.encoding = req.apparent_encoding
     html = fromstring(req.text)
-
-
+    location = html.xpath('//div[@class="crumb"]/a[2]/text()')[0]
+    ziyouxing ={}
+    title = html.xpath('//div[@class="l-topic"]/h1/text()')[0]
+    time = html.xpath('//div[@class="sub-tit"]/span[1]/em/text()')[0]
+    read_num = html.xpath('//div[@class="sub-tit"]/span[2]/em/text()')[0]
+    author_href=html.xpath('//div[@class="in-t"]/a/@href')[0]
+    author_src = html.xpath('//div[@class="author"/a/img/@src]')[0]
+    author_name = html.xpath('//div[@class="in-t"]/a/span/text()')[0]
+    author_identity = html.xpath('//div[@class="in-t"]/span[@class="rz"]/text()')[0]
+    gonglveDetail = html.xpath('//div[@class="_j_content"]')
 if __name__ == '__main__':
     app.run()
