@@ -1,5 +1,6 @@
 from db.db_con import *
 from datetime import datetime
+from dateutil.parser import parse
 from db.db_class import *
 import time
 
@@ -192,6 +193,8 @@ def update_user_account(mail_number, password=None, salt=None):
 def add_daka(user_id):
     session = get_con()
     try:
+        # 得到最后一次的打卡时间
+        last_time = select_daka(user_id)[-1].update_time
         update_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
         daka = DaKa(user_id=user_id, num=1, update_time=update_time)
         session.add(daka)
@@ -309,4 +312,6 @@ def add_gong_lve(nav_left, nav_right_img, content):
 
 
 if __name__ == '__main__':
-    add_daka(1)
+    a = parse('2018-10-10 12:02:11')
+    b = parse('2018-10-10 12:02:11')
+    print((a-b).days)

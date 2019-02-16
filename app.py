@@ -58,7 +58,7 @@ def login_success():
     """
     account = session.get('account')
     if account is not None:
-        return json.dumps({'status': 200, 'message': '没有登录'}, ensure_ascii=False)
+        return json.dumps({'status': 200, 'message': '登录成功'}, ensure_ascii=False)
     return json.dumps({'status': 401, 'message': '没有登录'}, ensure_ascii=False)
 
 
@@ -162,7 +162,7 @@ def to_user_send_mail():
     """
     try:
         # 获取用户名
-        usermail = session.get('account')
+        usermail = session.get('regist_account')
         if usermail is None:
             app.logger.info('缺失account参数')
             return json.dumps({'status': 200, 'message': '参数错误', 'args': 0}, ensure_ascii=False)
@@ -229,7 +229,7 @@ def user_register():
     try:
         data_json = request.get_json()
         # 获取用户名
-        usermail = session.get('account')
+        usermail = session.get('regist_account')
         # 获取密码
         password = data_json.get('passwd')
         # 获取昵称
@@ -237,7 +237,7 @@ def user_register():
         # 验证码
         usercode = data_json.get('code')
         if usermail is None or password is None or name is None or usercode is None:
-            return json.dumps({'status': 400, 'args': 0}, ensure_ascii=False)
+            return json.dumps({'status': 400, 'args': 0,'message':'密码或账号不能为空'}, ensure_ascii=False)
         if redis_con.get(usermail + 'code') is None:
             app.logger.info(usermail + '验证码失效')
             return json.dumps({'status': 200, 'message': '验证码已经过期', 'args': 0}, ensure_ascii=False)
@@ -262,7 +262,7 @@ def user_register():
             # 用户个人信息存储到session里
             session['user'] = pickle.dumps(select_user(user_account.id))
             app.logger.info(usermail + '注册成功')
-            return json.dumps({'status': 200, 'message': '注册成功'}, ensure_ascii=False)
+            return json.dumps({'status': 200, 'message': '注册成功','args':1}, ensure_ascii=False)
     except Exception as e:
         app.logger.error('error' + str(e))
         return json.dumps({'status': 500, 'message': '系统错误'}, ensure_ascii=False)
@@ -311,7 +311,7 @@ def account_verification():
         user_account = select_user_account(account)
         if user_account is None:
             app.logger.info(account + '用户名可以使用')
-            session['account'] = account
+            session['regist_account'] = account
             return json.dumps({'status': 200, 'message': '用户名可以使用', 'args': 1}, ensure_ascii=False)
         else:
             app.logger.info(account + '用户名不可以使用')
