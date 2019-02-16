@@ -219,16 +219,18 @@ def add_daka(user_id):
     session = get_con()
     try:
         # 得到最后一次的打卡时间
-        last_daka = select_daka(user_id)[-1]
-        last_time = last_daka.update_time
         update_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
-        a = parse(update_time)
-        b = parse(str(last_time))
-        sub = (a-b).days
+        last_time = update_time
         days = 1
-        # 连续打卡了
-        if sub <=1:
-            days = last_daka.days+1
+        if len(select_daka(user_id)) !=0:
+            last_daka = select_daka(user_id)[-1]
+            last_time = last_daka.update_time
+            a = parse(update_time)
+            b = parse(str(last_time))
+            sub = (a-b).days
+            # 连续打卡了
+            if sub <=1:
+                days = last_daka.days+1
         num = days%7 if days%7!=0 else 7
         user = select_user_by_Id(user_id)
         honey = user.honey+num

@@ -602,12 +602,12 @@ def daka():
     :return:
     """
     try:
-        user = session.get('user')
+        user = pickle.loads(session.get('user'))
         num = add_daka(user.id)
         app.logger.info(str(session.get('account')) + '打卡成功')
         return json.dumps({'status': 200, 'message': '打卡成功', 'args': 1,'num':num}, ensure_ascii=False)
     except Exception as e:
-        app.logger.info(session.get('account') + '打卡失败' + 'error:' + e)
+        app.logger.info(session.get('account') + '打卡失败' + 'error:' + str(e))
         return json.dumps({'status': 500, 'message': '打卡失败', 'args': 0}, ensure_ascii=False)
 
 
@@ -682,11 +682,7 @@ def get_youji():
             contentDetail.extend(data[0])
             if data[1] == '':
                 break
-        print(contentDetail)
         app.logger.info('游记内容抓取')
-        print(len(str(contentHead)))
-        print(len(str(contentText)))
-        print(len(str(contentDetail)))
         add_youji(str(contentHead), str(contentText), str(contentDetail))
         return json.dumps(
             {'status': 200, 'contentHead': contentHead, 'contentText': contentText, 'contentDetail': contentDetail},
@@ -799,6 +795,13 @@ def get_gong_lve():
         app.logger.info('error:' + str(e))
         return json.dumps({'status': 500, 'message': '系统错误'})
 
+@app.route('/ziyouxing',methods=['GET'])
+def ziyouxing():
+    url = ''
+    headers = {}
+    req = requests.get(url = url,headers = headers)
+    req.encoding = req.apparent_encoding
+    html = fromstring(req.text)
 
 if __name__ == '__main__':
     app.run()
