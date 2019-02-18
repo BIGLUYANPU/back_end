@@ -741,7 +741,7 @@ def youji_related():
             href = 'http://www.mafengwo.cn' + str(li.xpath('a[@class="_j_mddrel_gl_item"]/@href')[0])
             src = li.xpath('a[@class="_j_mddrel_gl_item"]/img/@src')[0]
             view = li.xpath('a[@class="_j_mddrel_gl_item"]/span/text()')[0]
-            gonglve.append({'key': key, 'title': title, 'href': href, 'view': view,'src':src})
+            gonglve.append({'key': key, 'title': title, 'href': href, 'view': view, 'src': src})
             li_index = li_index + 1
         url = 'https://pagelet.mafengwo.cn/note/pagelet/recNoteApi?params={"iid":' + str(id) + '}'
         req = requests.get(url=url, headers=headers)
@@ -757,7 +757,7 @@ def youji_related():
             href = 'http://www.mafengwo.cn' + str(li.xpath('a[@class="_j_mddrel_gl_item"]/@href')[0])
             src = li.xpath('a[@class="_j_mddrel_gl_item"]/img/@src')[0]
             view = li.xpath('a[@class="_j_mddrel_gl_item"]/span/text()')[0]
-            youji_list.append({'key': key, 'title': title, 'href': href, 'view': view,'src':src})
+            youji_list.append({'key': key, 'title': title, 'href': href, 'view': view, 'src': src})
             li_index = li_index + 1
         return json.dumps({'mdd': mdd, 'gonglve': gonglve, 'youji': youji_list, 'status': 200}, ensure_ascii=False)
     except Exception as e:
@@ -808,8 +808,16 @@ def get_gong_lve():
 
 @app.route('/ziyouxing', methods=['GET'])
 def ziyouxing():
-    id = request.values.get('id')
-    location,ziyouxingl,ziyouxingr ,ziyouxing_related= ziyouxing_parser(id)
-    return json.dumps({'status':200,'ziyouxingl':ziyouxingl,'location':location,'ziyouxingr':ziyouxingr,'ziyouxing_related':ziyouxing_related},ensure_ascii=False)
+    try:
+        id = request.values.get('id')
+        location, ziyouxingl, ziyouxingr, ziyouxing_related = ziyouxing_parser(id)
+        app.logger.info('message:'+'ziyouxing')
+        return json.dumps({'status': 200, 'ziyouxingl': ziyouxingl, 'location': location, 'ziyouxingr': ziyouxingr,
+                           'ziyouxing_related': ziyouxing_related, 'args': 1}, ensure_ascii=False)
+    except Exception as e:
+        app.logger.infor('error:' + str(e))
+        return json.dumps({'status': 500, 'message': '系统错误', 'args': 0})
+
+
 if __name__ == '__main__':
     app.run()
