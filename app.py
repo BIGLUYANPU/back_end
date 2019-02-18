@@ -810,6 +810,6 @@ def get_gong_lve():
 def ziyouxing():
     id = request.values.get('id')
     location,ziyouxingl,ziyouxingr ,ziyouxing_related= ziyouxing_parser(id)
-    return json.dumps({'status':200,'ziyouxingl':ziyouxingl,'location':location,'ziyouxingr':ziyouxingr,'ziyouxing_related':ziyouxing_related})
+    return json.dumps({'status':200,'ziyouxingl':ziyouxingl,'location':location,'ziyouxingr':ziyouxingr,'ziyouxing_related':ziyouxing_related},ensure_ascii=False)
 if __name__ == '__main__':
     app.run()

@@ -704,78 +704,88 @@ def gonglve_content_parser_3():
 
 
 def ziyouxing_parser(id):
-    url = 'https://www.mafengwo.cn/gonglve/ziyouxing/' + str(id) + '.html'
-    headers = {
-        'Host': 'www.mafengwo.cn',
-        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36',
-        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
-        'Cache-Control': 'no-cache',
-        'pragma': 'no-cache',
-        'Upgrade - Insecure - Requests': '1'
-    }
-    req = requests.get(url=url, headers=headers)
-    req.encoding = req.apparent_encoding
-    html = fromstring(req.text)
-    location = html.xpath('//div[@class="crumb"]/a[2]/text()')[0]
-    ziyouxingl = {}
-    title = html.xpath('//div[@class="l-topic"]/h1/text()')[0]
-    read_num = html.xpath('//div[@class="sub-tit"]/span[1]/em/text()')[0]
-    time = html.xpath('//div[@class="sub-tit"]/span[2]/em/text()')[0].strip()
-    author_href = html.xpath('//div[@class="in-t"]/a/@href')[0]
-    author_src = html.xpath('//div[@class="author"]/a/img/@src')[0]
-    author_name = html.xpath('//div[@class="in-t"]/a/span/text()')[0]
-    author_identity = html.xpath('//div[@class="in-t"]/span[@class="rz"]/text()')[0]
-    gonglveDetail = etree.tostring(etree.HTML(req.text).xpath('//div[@class="_j_content"]')[0], encoding='utf-8',
-                                   method='html').decode('utf-8')
-    soup = BeautifulSoup(gonglveDetail, 'html.parser').contents[0]
-    for tag in soup.contents:
-        if isinstance(tag, Tag):
-            for div_list in tag:
-                if isinstance(div_list, Tag):
-                    if div_list.name == 'img':
-                        div_list.attrs['src'] = div_list.attrs['data-src']
+    try:
+        url = 'https://www.mafengwo.cn/gonglve/ziyouxing/' + str(id) + '.html'
+        headers = {
+            'Host': 'www.mafengwo.cn',
+            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36',
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
+            'Cache-Control': 'no-cache',
+            'pragma': 'no-cache',
+            'Upgrade - Insecure - Requests': '1'
+        }
+        req = requests.get(url=url, headers=headers)
+        req.encoding = 'utf-8'
+        html = fromstring(req.text)
+        location = html.xpath('//div[@class="crumb"]/a[2]/text()')[0]
+        ziyouxingl = {}
+        title = html.xpath('//div[@class="l-topic"]/h1/text()')[0]
+        read_num = html.xpath('//div[@class="sub-tit"]/span[1]/em/text()')[0]
+        time = html.xpath('//div[@class="sub-tit"]/span[2]/em/text()')[0].strip()
+        author_href = html.xpath('//div[@class="in-t"]/a/@href')[0]
+        author_src = html.xpath('//div[@class="author"]/a/img/@src')[0]
+        author_name = html.xpath('//div[@class="in-t"]/a/span/text()')[0]
+        author_identity = html.xpath('//div[@class="in-t"]/span[@class="rz"]/text()')[0]
+        gonglveDetail = etree.tostring(etree.HTML(req.text).xpath('//div[@class="_j_content"]')[0], encoding='utf-8',
+                                       method='html').decode('utf-8')
+        soup = BeautifulSoup(gonglveDetail, 'html.parser').contents[0]
+        for tag in soup.contents:
+            if isinstance(tag, Tag):
+                for div_list in tag:
+                    if isinstance(div_list, Tag):
+                        if div_list.name == 'img':
+                            div_list.attrs['src'] = div_list.attrs['data-src']
+                            break
                         break
-                    break
-    ziyouxingl['title'] = title
-    ziyouxingl['read_num'] = read_num
-    ziyouxingl['time'] = time
-    ziyouxingl['author_href'] = author_href
-    ziyouxingl['author_src'] = author_src
-    ziyouxingl['author_name'] = author_name
-    ziyouxingl['author_identity'] = author_identity
-    ziyouxingr = {}
-    selector = html.xpath('//div[@class="bar-sar clearfix"]')[0]
-    comment_num = selector.xpath('a[@class="_j_goto_comment"]/em/text()')[0]
-    collect_num = selector.xpath('div[@class="bs_collect"]/a/em/text()')[0]
-    share_num = selector.xpath('div[@class="bs_share"]/a/em/text()')[0]
-    zan_num = selector.xpath('a[@class="_j_like_btn"]/em/text()')[0]
-    ding_num = selector.xpath('a[@class="_j_support_btn"]/em/text()')[0]
-    catalogue = []
-    selector = html.xpath('//div[@class="section"]/div[@class="top"]')
-    section_index = 1
-    for a in selector:
-        key = section_index
-        title = a.xpath('a/text()')[0]
-        catalogue.append({'key': key, 'title': title})
-        section_index = section_index + 1
-    ziyouxing_related = {}
-    gong_lve = []
-    mdd_id = html.xpath('//div[@class="crumb"]/a[2]/@href')[0].split('_')[:-1]
-    url = 'https://www.mafengwo.cn/gonglve/ziyouxing/detail/relation_guides?gid='+id+'&mddid=+'+mdd_id
-    req = requests.get(url=url,headers=headers)
-    html = json.loads(req.text)
-    selector = fromstring(html)
-    ul = selector.xpath('//ul[@class="bd clearfix"]/li')
-    li_index = 1
-    for li in ul:
-        key = li_index
-        related_title = li.xpath('li/a/@title')[0]
-        related_href = li.xpath('li/a/@href')[0]
-        related_src = li.xpath('li/a/div[@class="img"]/@src')[0]
-        related_p1 = li.xpath('li/a/div[@class="info"]/div/p[1]/text()')[0]
-        related_p2 = li.xpath('li/a/div[@class="info"]/div/p[2]/text()')[0]
-        gong_lve.append({'key':key,'related_title':related_title,'related_src':related_src,'related_href':related_href,'related_p1':related_p1,'related_p2':related_p2})
-        li_index = li_index +1
-    ziyouxing_related['gong_lve'] = gong_lve
-    ziyouxing_related['more_href'] = selector.xpath('//a[@class="pro_more"]/@href')[0]
-    return location,ziyouxingl,ziyouxingr,ziyouxing_related
+        ziyouxingl['title'] = title
+        ziyouxingl['read_num'] = read_num
+        ziyouxingl['time'] = time
+        ziyouxingl['author_href'] = author_href
+        ziyouxingl['author_src'] = author_src
+        ziyouxingl['author_name'] = author_name
+        ziyouxingl['author_identity'] = author_identity
+        ziyouxingr = {}
+        selector = html.xpath('//div[@class="bar-sar clearfix"]')[0]
+        comment_num = selector.xpath('a[@class="_j_goto_comment"]/em/text()')[0]
+        collect_num = selector.xpath('div[@class="bs_collect"]/a/em/text()')[0]
+        share_num = selector.xpath('div[@class="bs_share"]/a/em/text()')[0]
+        zan_num = selector.xpath('a[@class="_j_like_btn"]/em/text()')[0]
+        ding_num = selector.xpath('a[@class="_j_support_btn"]/em/text()')[0]
+        catalogue = []
+        selector = html.xpath('//div[@class="section"]/div[@class="top"]')
+        section_index = 1
+        for a in selector:
+            key = section_index
+            title = a.xpath('a/text()')[0]
+            catalogue.append({'key': key, 'title': title})
+            section_index = section_index + 1
+        ziyouxingr['comment_num'] = comment_num
+        ziyouxingr['collect_num'] = collect_num
+        ziyouxingr['share_num'] = share_num
+        ziyouxingr['zan_num'] = zan_num
+        ziyouxingr['ding_num'] = ding_num
+        ziyouxingr['catalogue'] = catalogue
+        ziyouxing_related = {}
+        gong_lve = []
+        mdd_id = html.xpath('//div[@class="crumb"]/a[2]/@href')[0].split('_')[1][:-1]
+        url = 'https://www.mafengwo.cn/gonglve/ziyouxing/detail/relation_guides?gid='+id+'&mddid=+'+mdd_id
+        req = requests.get(url=url,headers=headers)
+        req.encoding = 'utf-8'
+        html = json.loads(req.text)['html']
+        selector = fromstring(html)
+        ul = selector.xpath('//ul[@class="bd clearfix"]/li')
+        li_index = 1
+        for li in ul:
+            key = li_index
+            related_title = li.xpath('a/@title')[0]
+            related_href = li.xpath('a/@href')[0]
+            related_src = li.xpath('a/div[@class="img"]/img/@src')[0]
+            related_p1 = li.xpath('a/div[@class="info"]/div/p[1]/text()')[0]
+            related_p2 = li.xpath('a/div[@class="info"]/div/p[2]/text()')[0]
+            gong_lve.append({'key':key,'related_title':related_title,'related_src':related_src,'related_href':related_href,'related_p1':related_p1,'related_p2':related_p2})
+            li_index = li_index +1
+        ziyouxing_related['gong_lve'] = gong_lve
+        ziyouxing_related['more_href'] = selector.xpath('//a[@class="pro_more"]/@href')[0]
+        return location,ziyouxingl,ziyouxingr,ziyouxing_related
+    except Exception as e:
+        print(e)
