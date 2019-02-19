@@ -811,21 +811,39 @@ def ziyouxing():
     try:
         id = request.values.get('id')
         location, ziyouxingl, ziyouxingr, ziyouxing_related = ziyouxing_parser(id)
-        app.logger.info('message:'+'ziyouxing')
+        app.logger.info('message:' + 'ziyouxing')
         return json.dumps({'status': 200, 'ziyouxingl': ziyouxingl, 'location': location, 'ziyouxingr': ziyouxingr,
                            'ziyouxing_related': ziyouxing_related, 'args': 1}, ensure_ascii=False)
     except Exception as e:
         app.logger.infor('error:' + str(e))
         return json.dumps({'status': 500, 'message': '系统错误', 'args': 0})
 
-@app.route('/wenda',methods = ['GET'])
+
+@app.route('/wenda', methods=['GET'])
 def wenda():
     try:
         id = request.values.get('id')
         mdd, mdd_href, title, detail, tags, user, time, liulan_num, guanzhu_num, num, answer_list = wenda_parser(id)
-        return json.dumps({'status':200,'mdd':mdd,'mdd_href':mdd_href,'title':title,'detail':detail,'tags':tags,'user_name':user.get('user_name'),'user_href':user.get('user_href'),'user_img':user.get('user_img'),'time':time,'liulan_num':liulan_num,'guanzhu_num':guanzhu_num,'num':num,'answer_list':answer_list},ensure_ascii=False)
+        return json.dumps(
+            {'status': 200, 'mdd': mdd, 'mdd_href': mdd_href, 'title': title, 'detail': detail, 'tags': tags,
+             'user_name': user.get('user_name'), 'user_href': user.get('user_href'), 'user_img': user.get('user_img'),
+             'time': time, 'liulan_num': liulan_num, 'guanzhu_num': guanzhu_num, 'num': num,
+             'answer_list': answer_list}, ensure_ascii=False)
     except Exception as e:
-        app.logger.info("error:"+str(e))
-        return json.dumps({'status':200,'message':'系统错误','args':0},ensure_ascii=False)
+        app.logger.info("error:" + str(e))
+        return json.dumps({'status': 200, 'message': '系统错误', 'args': 0}, ensure_ascii=False)
+
+
+@app.route('/wenda_related', methods=['GET'])
+def wenda_related():
+    try:
+        id = request.values.get('id')
+        activity, related_questions = wenda_related_parser(id)
+        return json.dumps({'status':200,'args':1,'activity':activity,'related_questions':related_questions},ensure_ascii=False)
+    except Exception as e:
+        app.logger.info('error:'+str(e))
+        return json.dumps({'status':500,'args':0},ensure_ascii=False)
+
+
 if __name__ == '__main__':
     app.run()

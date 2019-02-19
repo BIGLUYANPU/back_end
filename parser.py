@@ -860,3 +860,58 @@ def wenda_parser(id):
         return mdd,mdd_href,title,detail,tags,user,time,liulan_num,guanzhu_num,num,answer_list
     except Exception as e:
         print(e)
+
+
+def wenda_related_parser(id):
+    try:
+        url = 'https://www.mafengwo.cn/wenda/detail-' + id + '.html'
+        headers = {
+            'Host': 'www.mafengwo.cn',
+            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36',
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
+            'Cache-Control': 'no-cache',
+            'Upgrade - Insecure - Requests': '1',
+            'Pragma': 'no-cache'
+        }
+        req = requests.get(url=url, headers=headers)
+        req.encoding = 'utf-8'
+        selector = fromstring(req.text)
+        mdd_id = selector.xpath('//div[@class="q-content"]/div[@class="q-title"]/a[@class="location"]/@href')[0].split('-')[1].split('.')[0]
+        url = 'https://pagelet.mafengwo.cn/qa/pagelet/TopRecommendApi?params={"mddid":'+mdd_id+'}'
+        headers = {
+            'Host': 'pagelet.mafengwo.cn',
+            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36',
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
+            'Cache-Control': 'no-cache',
+            'pragma': 'no-cache',
+            'Upgrade - Insecure - Requests': '1'
+        }
+        req = requests.get(url=url, headers=headers)
+        data = json.loads(req.text)['data']['html']
+        html = fromstring(data)
+        activity = []
+        ul = html.xpath('//ul[@class="slide-img"]/li')
+        activity_index = 1
+        for li in ul:
+            href = li.xpath('a/@href')[0]
+            src = li.xpath('a/img/@src')[0]
+            key = int('1' + str(activity_index))
+            activity_index = activity_index + 1
+            activity.append({'key': key, 'href': href, 'src': src})
+        url = 'https://pagelet.mafengwo.cn/qa/pagelet/RelationQuestionApi?params={"qid":'+id+'}'
+        req = requests.get(url=url, headers=headers)
+        data = json.loads(req.text)['data']['html']
+        html = fromstring(data)
+        related_questions = []
+        ul = html.xpath('//ul[@class="bd"]/li')
+        related_index = 1
+        for li in ul:
+            title = li.xpath('a/text()')[0].strip()
+            href = li.xpath('a/@href')[0]
+            answer = li.xpath('span/text()')[0]
+            key = int('2' + str(related_index))
+            related_index = related_index + 1
+            related_questions.append({'key': key, 'href': href, 'answer': answer, 'title': title})
+        return activity, related_questions
+    except Exception as  e:
+        print(e)
