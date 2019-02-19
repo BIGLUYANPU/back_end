@@ -517,13 +517,13 @@ def parser_youji_head_text(id):
             '//div[@class="tarvel_dir_list clearfix"]/ul/li[@class="time"]/text()')) == 0 else selector.xpath(
             '//div[@class="tarvel_dir_list clearfix"]/ul/li[@class="time"]/text()')
         day = '' if len(selector.xpath('//div[@class="tarvel_dir_list clearfix"]/ul/li[@class="day"]/text()')) == 0 else \
-        selector.xpath('//div[@class="tarvel_dir_list clearfix"]/ul/li[@class="day"]/text()')[1]
+            selector.xpath('//div[@class="tarvel_dir_list clearfix"]/ul/li[@class="day"]/text()')[1]
         people = '' if len(
             selector.xpath('//div[@class="tarvel_dir_list clearfix"]/ul/li[@class="people"]/text()')) == 0 else \
-        selector.xpath('//div[@class="tarvel_dir_list clearfix"]/ul/li[@class="people"]/text()')[1]
+            selector.xpath('//div[@class="tarvel_dir_list clearfix"]/ul/li[@class="people"]/text()')[1]
         cost = '' if len(
             selector.xpath('//div[@class="tarvel_dir_list clearfix"]/ul/li[@class="cost"]/text()')) == 0 else \
-        selector.xpath('//div[@class="tarvel_dir_list clearfix"]/ul/li[@class="cost"]/text()')[1]
+            selector.xpath('//div[@class="tarvel_dir_list clearfix"]/ul/li[@class="cost"]/text()')[1]
         contentText['time'] = time
         contentText['day'] = day
         contentText['people'] = people
@@ -768,8 +768,8 @@ def ziyouxing_parser(id):
         ziyouxing_related = {}
         gong_lve = []
         mdd_id = html.xpath('//div[@class="crumb"]/a[2]/@href')[0].split('_')[1][:-1]
-        url = 'https://www.mafengwo.cn/gonglve/ziyouxing/detail/relation_guides?gid='+id+'&mddid=+'+mdd_id
-        req = requests.get(url=url,headers=headers)
+        url = 'https://www.mafengwo.cn/gonglve/ziyouxing/detail/relation_guides?gid=' + id + '&mddid=+' + mdd_id
+        req = requests.get(url=url, headers=headers)
         req.encoding = 'utf-8'
         html = json.loads(req.text)['html']
         selector = fromstring(html)
@@ -782,10 +782,81 @@ def ziyouxing_parser(id):
             related_src = li.xpath('a/div[@class="img"]/img/@src')[0]
             related_p1 = li.xpath('a/div[@class="info"]/div/p[1]/text()')[0]
             related_p2 = li.xpath('a/div[@class="info"]/div/p[2]/text()')[0]
-            gong_lve.append({'key':key,'related_title':related_title,'related_src':related_src,'related_href':related_href,'related_p1':related_p1,'related_p2':related_p2})
-            li_index = li_index +1
+            gong_lve.append(
+                {'key': key, 'related_title': related_title, 'related_src': related_src, 'related_href': related_href,
+                 'related_p1': related_p1, 'related_p2': related_p2})
+            li_index = li_index + 1
         ziyouxing_related['gong_lve'] = gong_lve
         ziyouxing_related['more_href'] = selector.xpath('//a[@class="pro_more"]/@href')[0]
-        return location,ziyouxingl,ziyouxingr,ziyouxing_related
+        return location, ziyouxingl, ziyouxingr, ziyouxing_related
+    except Exception as e:
+        print(e)
+
+
+def wenda_parser(id):
+    try:
+        url = 'https://www.mafengwo.cn/wenda/detail-' + id + '.html'
+        headers = headers = {
+            'Host': 'www.mafengwo.cn',
+            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36',
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
+            'Cache-Control': 'no-cache',
+            'Upgrade - Insecure - Requests': '1',
+            'Pragma': 'no-cache'
+        }
+        req = requests.get(url=url, headers=headers)
+        req.encoding = 'utf-8'
+        selector = fromstring(req.text)
+        mdd = selector.xpath('//div[@class="q-content"]/div[@class="q-title"]/a[@class="location"]/text()')[0]
+        mdd_href = selector.xpath('//div[@class="q-content"]/div[@class="q-title"]/a[@class="location"]/@href')[0]
+        title = selector.xpath('//div[@class="q-content"]/div[@class="q-title"]/h1/text()')[0].strip()
+        detail = selector.xpath('//div[@class="q-content"]/div[@class="q-desc"]/text()')[0]
+        tags = []
+        tag = selector.xpath('//div[@class="q-tags fl"]/a')
+        tag_a_index = 1
+        for a in tag:
+            key = tag_a_index
+            href = a.xpath('@href')[0]
+            name = a.xpath('text()')[0]
+            tags.append({'key': key, 'name': name, 'href': href})
+            tag_a_index = tag_a_index + 1
+        user_href = selector.xpath('//div[@class="pub-bar fr"]/a[@class="photo"]/@href')[0]
+        user_img = selector.xpath('//div[@class="pub-bar fr"]/a[@class="photo"]/img/@src')[0]
+        user_name = selector.xpath('//div[@class="pub-bar fr"]/a[@class="name"]/text()')[0]
+        user = {}
+        user['user_href'] = user_href
+        user['user_img'] = user_img
+        user['user_name'] = user_name
+        time = selector.xpath('//div[@class="pub-bar fr"]/span/span/text()')[0]
+        liulan_num = selector.xpath('//div[@class="q-operate clearfix"]/div[@class="fr"]/span[1]/text()')[0]
+        guanzhu_num = selector.xpath('//div[@class="q-operate clearfix"]/div[@class="fr"]/span[2]/span/text()')[0]
+        num = selector.xpath('//div[@class="answer-wrap"]/div[@class="hd"]/span/text()')[0]
+        answer_list = []
+        answer_li_index = 1
+        huida_li = selector.xpath('//div[@id="normal_answer_wrap"]/li')
+        for li in huida_li:
+            key = answer_li_index
+
+            user_img = li.xpath(
+                'div[@class="answer-content _js_answer_content"]/div[@class="answer-info clearfix"]/div[@class="user-bar fl"]/a[@class="_j_filter_click avatar"]/img/@src')[
+                0]
+            user_name = li.xpath(
+                'div[@class="answer-content _js_answer_content"]/div[@class="answer-info clearfix"]/div[@class="user-bar fl"]/a[@class="name"]/text()')[
+                0]
+            user_level = li.xpath(
+                'div[@class="answer-content _js_answer_content"]/div[@class="answer-info clearfix"]/div[@class="user-bar fl"]/a[@class="level"]/text()')[
+                0]
+            user_href = li.xpath(
+                'div[@class="answer-content _js_answer_content"]/div[@class="answer-info clearfix"]/div[@class="user-bar fl"]/a[@class="name"]/@href')[
+                0]
+            guide = False if len(li.xpath(
+                'div[@class="answer-content _js_answer_content"]/div[@class="answer-info clearfix"]/div[@class="user-bar fl"]/a[@class="identity i-guide"]')) == 0 else True
+            gold = False if len(li.xpath(
+                'div[@class="answer-content _js_answer_content"]/div[@class="answer-info clearfix"]/ul[@class="answer-medal fr"]/li[@class="gold"]/div/a')) == 0 else True
+            answer = etree.tostring(li.xpath('div[@class="answer-content _js_answer_content"]/div[@class="_j_short_answer_item hide"]/div[@class="_j_answer_html"]')[0], encoding='utf-8',method='html').decode('utf-8')
+            answer_list.append({'key':key,'answer':answer,'gold':gold,'guide':guide,'user_href':user_href,'user_level':user_level,'user_img':user_img,'user_name':user_name})
+            answer_li_index = answer_li_index + 1
+
+        return mdd,mdd_href,title,detail,tags,user,time,liulan_num,guanzhu_num,num,answer_list
     except Exception as e:
         print(e)
