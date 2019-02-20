@@ -56,18 +56,18 @@ def login_success():
     判断是否为登录状态
     :return:daka是True代表今天打卡
     """
-    # account = session.get('account')
-    # user = session.get('user')
-    # if user is None or account is None:
-    #     return json.dumps({'status': 401, 'message': '没有登录'}, ensure_ascii=False)
-    # user = pickle.loads(user)
+    account = session.get('account')
+    user = session.get('user')
+    if user is None or account is None:
+        return json.dumps({'status': 401, 'message': '没有登录'}, ensure_ascii=False)
+    user = pickle.loads(user)
     # 得到用户最后一次打卡的时间
     daka = True
-    daka_list = select_daka(2)
+    daka_list = select_daka(user.id)
     if len(daka_list) == 0:
         daka = False
     else:
-        update_time = select_daka(2)[-1].update_time
+        update_time = select_daka(user.id)[-1].update_time
         # 得到当前时间
         time_now = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
         # 得到当前时间和用户最后一次打卡时间的差值
@@ -619,8 +619,8 @@ def daka():
     :return:
     """
     try:
-        # user = pickle.loads(session.get('user'))
-        num = add_daka(1)
+        user = pickle.loads(session.get('user'))
+        num = add_daka(user.id)
         app.logger.info(str(session.get('account')) + '打卡成功')
         return json.dumps({'status': 200, 'message': '打卡成功', 'args': 1, 'num': num}, ensure_ascii=False)
     except Exception as e:
