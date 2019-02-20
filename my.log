@@ -260,3 +260,108 @@ jinja2.exceptions.TemplateNotFound: a.html
 2019-01-30 18:56:53,325 - INFO - app.py - to_user_send_reset_mail - 173 - 邮件发送成功
 2019-01-30 18:59:45,326 - INFO - app.py - get_index - 556 - 主页游记还有头图
 2019-01-30 18:59:45,649 - INFO - app.py - get_index - 556 - 主页游记还有头图
+2019-02-09 14:47:18,306 - ERROR - app.py - get_index - 582 - error:name 'get_head_show_image' is not defined
+2019-02-09 15:00:51,868 - ERROR - app.py - get_index - 582 - error:name 'get_head_show_image' is not defined
+2019-02-09 15:20:08,802 - ERROR - app.py - get_index - 582 - error:name 'get_head_show_image' is not defined
+2019-02-09 15:32:27,067 - INFO - app.py - get_index - 577 - 主页游记还有头图
+2019-02-09 15:32:27,084 - INFO - app.py - get_index - 577 - 主页游记还有头图
+2019-02-09 17:16:07,242 - ERROR - app.py - get_youji - 639 - error:cannot unpack non-iterable NoneType object
+2019-02-09 23:40:11,905 - INFO - app.py - get_youji - 637 - 游记内容抓取
+2019-02-10 10:49:42,724 - ERROR - app.py - get_youji - 638 - error:add_youji() missing 2 required positional arguments: 'content_text' and 'content_detail'
+2019-02-10 10:50:08,280 - INFO - app.py - get_youji - 633 - 游记内容抓取
+2019-02-10 10:52:44,231 - INFO - app.py - get_youji - 633 - 游记内容抓取
+2019-02-10 10:52:44,528 - INFO - app.py - get_youji - 633 - 游记内容抓取
+2019-02-10 10:54:35,805 - INFO - app.py - get_youji - 633 - 游记内容抓取
+2019-02-10 10:54:36,439 - INFO - app.py - get_youji - 633 - 游记内容抓取
+2019-02-10 10:55:31,928 - INFO - app.py - get_youji - 633 - 游记内容抓取
+2019-02-10 10:57:53,073 - INFO - app.py - get_youji - 633 - 游记内容抓取
+2019-02-10 11:02:57,715 - INFO - app.py - get_youji - 633 - 游记内容抓取
+2019-02-10 11:06:38,759 - INFO - app.py - get_youji - 633 - 游记内容抓取
+2019-02-10 11:07:04,890 - INFO - app.py - get_youji - 633 - 游记内容抓取
+2019-02-10 11:28:16,762 - INFO - app.py - get_youji - 646 - 游记内容抓取
+2019-02-11 22:02:01,848 - INFO - app.py - daka - 579 - None打卡成功
+2019-02-15 22:04:12,477 - INFO - app.py - get_youji - 686 - 游记内容抓取
+2019-02-15 22:04:52,074 - INFO - app.py - get_youji - 686 - 游记内容抓取
+2019-02-16 16:14:57,076 - INFO - app.py - get_index - 630 - 主页游记还有头图
+2019-02-16 16:14:57,965 - INFO - app.py - get_index - 630 - 主页游记还有头图
+2019-02-16 16:15:22,426 - INFO - app.py - account_verification - 313 - 798218157@qq.com用户名可以使用
+2019-02-16 16:15:29,945 - ERROR - app.py - to_user_send_mail - 186 - error:Error 10061 connecting to 127.0.0.1:6379. 由于目标计算机积极拒绝，无法连接。.
+2019-02-16 16:15:47,417 - ERROR - app.py - user_register - 267 - errorError 10061 connecting to 127.0.0.1:6379. 由于目标计算机积极拒绝，无法连接。.
+2019-02-16 16:20:16,272 - INFO - app.py - to_user_send_mail - 183 - 邮件发送成功
+2019-02-16 16:20:34,861 - INFO - app.py - to_user_send_mail - 183 - 邮件发送成功
+2019-02-16 16:20:57,629 - INFO - app.py - to_user_send_mail - 183 - 邮件发送成功
+2019-02-16 16:21:13,851 - INFO - app.py - account_verification - 313 - 798218157@qq.com用户名可以使用
+2019-02-16 16:22:29,781 - INFO - app.py - account_verification - 313 - 798218157@qq.com用户名可以使用
+2019-02-16 16:22:38,024 - INFO - app.py - to_user_send_mail - 183 - 邮件发送成功
+2019-02-16 16:25:18,697 - INFO - app.py - get_index - 630 - 主页游记还有头图
+2019-02-16 16:25:19,046 - INFO - app.py - get_index - 630 - 主页游记还有头图
+2019-02-16 16:29:13,613 - INFO - app.py - get_index - 630 - 主页游记还有头图
+2019-02-16 16:29:14,040 - INFO - app.py - get_index - 630 - 主页游记还有头图
+2019-02-16 16:30:47,344 - INFO - app.py - user_quit - 127 - 798218157@qq.com退出了
+2019-02-16 16:32:01,747 - INFO - app.py - get_index - 630 - 主页游记还有头图
+2019-02-16 16:32:02,099 - INFO - app.py - get_index - 630 - 主页游记还有头图
+2019-02-16 16:33:52,829 - INFO - app.py - get_index - 630 - 主页游记还有头图
+2019-02-16 16:33:53,300 - INFO - app.py - get_index - 630 - 主页游记还有头图
+2019-02-16 16:34:42,569 - INFO - app.py - get_index - 630 - 主页游记还有头图
+2019-02-16 16:34:42,913 - INFO - app.py - get_index - 630 - 主页游记还有头图
+2019-02-16 16:34:49,314 - INFO - app.py - account_verification - 313 - pu971954596@qq.com用户名可以使用
+2019-02-16 16:34:58,047 - INFO - app.py - to_user_send_mail - 183 - 邮件发送成功
+2019-02-16 16:36:45,829 - INFO - app.py - account_verification - 313 - pu971954596@qq.com用户名可以使用
+2019-02-16 16:37:28,437 - INFO - app.py - get_index - 630 - 主页游记还有头图
+2019-02-16 16:37:28,870 - INFO - app.py - get_index - 630 - 主页游记还有头图
+2019-02-16 16:37:56,805 - INFO - app.py - get_index - 630 - 主页游记还有头图
+2019-02-16 16:37:57,275 - INFO - app.py - get_index - 630 - 主页游记还有头图
+2019-02-16 16:40:02,472 - INFO - app.py - account_verification - 313 - pu971954596@qq.com用户名可以使用
+2019-02-16 16:40:08,880 - INFO - app.py - to_user_send_mail - 183 - 邮件发送成功
+2019-02-16 16:40:18,784 - INFO - app.py - user_register - 264 - pu971954596@qq.com注册成功
+2019-02-16 16:49:57,743 - INFO - app.py - user_login - 103 - pu971954596@qq.com登录成功
+2019-02-16 16:49:58,286 - INFO - app.py - get_index - 630 - 主页游记还有头图
+2019-02-16 16:49:58,707 - INFO - app.py - get_index - 630 - 主页游记还有头图
+2019-02-16 16:52:05,151 - INFO - app.py - user_quit - 127 - pu971954596@qq.com退出了
+2019-02-16 16:52:05,527 - INFO - app.py - get_index - 630 - 主页游记还有头图
+2019-02-16 16:52:05,872 - INFO - app.py - get_index - 630 - 主页游记还有头图
+2019-02-16 16:52:16,844 - INFO - app.py - get_gong_lve - 795 - 攻略页面的抓取
+2019-02-16 16:52:17,788 - INFO - app.py - get_index - 630 - 主页游记还有头图
+2019-02-16 16:52:19,155 - INFO - app.py - get_gong_lve - 795 - 攻略页面的抓取
+2019-02-16 16:52:19,671 - INFO - app.py - get_index - 630 - 主页游记还有头图
+2019-02-16 16:54:48,360 - INFO - app.py - get_index - 630 - 主页游记还有头图
+2019-02-16 16:54:48,660 - INFO - app.py - get_index - 630 - 主页游记还有头图
+2019-02-16 19:12:25,361 - INFO - app.py - get_youji - 685 - 游记内容抓取
+2019-02-16 19:43:22,451 - ERROR - app.py - get_youji - 691 - error:'NoneType' object is not subscriptable
+2019-02-16 19:47:03,969 - INFO - app.py - get_youji - 685 - 游记内容抓取
+2019-02-16 19:47:04,016 - INFO - app.py - get_youji - 685 - 游记内容抓取
+2019-02-16 19:48:26,972 - INFO - app.py - get_youji - 685 - 游记内容抓取
+2019-02-16 19:49:39,222 - INFO - app.py - get_youji - 685 - 游记内容抓取
+2019-02-16 19:49:43,319 - ERROR - app.py - get_youji - 691 - error:cannot unpack non-iterable NoneType object
+2019-02-16 19:49:55,426 - ERROR - app.py - get_youji - 691 - error:cannot unpack non-iterable NoneType object
+2019-02-16 19:50:06,167 - ERROR - app.py - get_youji - 691 - error:cannot unpack non-iterable NoneType object
+2019-02-16 19:50:47,768 - ERROR - app.py - get_youji - 691 - error:cannot unpack non-iterable NoneType object
+2019-02-16 19:51:05,812 - ERROR - app.py - get_youji - 691 - error:cannot unpack non-iterable NoneType object
+2019-02-16 19:51:26,912 - ERROR - app.py - get_youji - 691 - error:cannot unpack non-iterable NoneType object
+2019-02-16 19:53:28,073 - ERROR - app.py - get_youji - 691 - error:cannot unpack non-iterable NoneType object
+2019-02-16 19:53:28,081 - ERROR - app.py - get_youji - 691 - error:cannot unpack non-iterable NoneType object
+2019-02-16 20:03:14,620 - ERROR - app.py - get_youji - 691 - error:cannot unpack non-iterable NoneType object
+2019-02-16 20:13:14,074 - INFO - app.py - get_youji - 685 - 游记内容抓取
+2019-02-16 20:15:08,389 - INFO - app.py - get_youji - 685 - 游记内容抓取
+2019-02-16 20:19:54,074 - ERROR - app.py - get_youji - 691 - error:can only concatenate str (not "NoneType") to str
+2019-02-16 20:20:28,244 - ERROR - app.py - get_youji - 691 - error:can only concatenate str (not "NoneType") to str
+2019-02-16 20:24:09,444 - INFO - app.py - get_youji - 685 - 游记内容抓取
+2019-02-16 20:24:13,098 - INFO - app.py - get_youji - 685 - 游记内容抓取
+2019-02-16 20:25:44,450 - INFO - app.py - get_youji - 685 - 游记内容抓取
+2019-02-16 20:28:36,111 - INFO - app.py - get_youji - 685 - 游记内容抓取
+2019-02-17 09:20:26,346 - INFO - app.py - get_youji - 693 - 游记内容抓取
+2019-02-19 13:50:26,142 - INFO - app.py - wenda - 828 - error:list index out of range
+2019-02-19 13:50:31,074 - INFO - app.py - wenda - 828 - error:list index out of range
+2019-02-19 14:01:57,606 - INFO - app.py - wenda - 828 - error:'lxml.etree._ElementUnicodeResult' object has no attribute 'stript'
+2019-02-20 12:08:47,100 - INFO - app.py - ziyouxing - 819 - message:ziyouxing
+2019-02-20 12:08:53,291 - INFO - app.py - get_index - 643 - 主页游记还有头图
+2019-02-20 12:09:19,179 - INFO - app.py - get_gong_lve - 806 - 攻略页面的抓取
+2019-02-20 12:15:11,619 - INFO - app.py - daka - 620 - None打卡成功
+2019-02-20 13:14:37,592 - INFO - app.py - get_gong_lve - 810 - 攻略页面的抓取
+2019-02-20 13:20:07,570 - INFO - app.py - get_destination - 789 - 目的地页面的抓取
+2019-02-20 13:37:41,530 - INFO - app.py - get_gong_lve - 810 - 攻略页面的抓取
+2019-02-20 13:38:35,519 - INFO - app.py - get_destination - 789 - 目的地页面的抓取
+2019-02-20 13:39:41,790 - INFO - app.py - get_destination - 789 - 目的地页面的抓取
+2019-02-20 13:39:59,793 - INFO - app.py - get_gong_lve - 810 - 攻略页面的抓取
+2019-02-20 14:24:40,003 - INFO - app.py - get_gong_lve - 810 - 攻略页面的抓取
+2019-02-20 14:25:09,371 - INFO - app.py - get_gong_lve - 810 - 攻略页面的抓取
