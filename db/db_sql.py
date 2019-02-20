@@ -245,7 +245,7 @@ def add_daka(user_id):
         honey = user.honey+num
         add_user(user.user_id,honey=honey)
         # 添加打卡记录
-        daka = DaKa(user_id=user_id,update_time=update_time,last_time=last_time,days=days,status=1)
+        daka = DaKa(user_id=user_id,update_time=update_time,last_time=last_time,days=days)
         session.add(daka)
         session.commit()
         return num
