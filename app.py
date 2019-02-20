@@ -605,7 +605,7 @@ def user_wallet():
         user = pickle.loads(session.get('user'))
         app.logger.info(account + '用户的钱包信息')
         return json.dumps(
-            {'status': 200, 'message': '查询成功', 'user': {'money': user.money, 'honey': user.honey}, 'args': 1},
+            {'status': 200, 'message': '查询成功', 'user': {'money': user.money, 'honey': user.honey,'args':1}, 'args': 1},
             ensure_ascii=False)
     except Exception as e:
         app.logger.error('error:' + str(e))
@@ -646,11 +646,11 @@ def get_index():
         add_hot_data_img(str(hot_list), str(hot_list))
         app.logger.info('主页游记还有头图')
         return json.dumps(
-            {'status': 200, 'hot_data': hot_list, 'dataimg': show_image, 'hot_count': hot_list_count, 'filter': fil},
+            {'status': 200,'args':1,'hot_data': hot_list, 'dataimg': show_image, 'hot_count': hot_list_count, 'filter': fil},
             ensure_ascii=False)
     except Exception as e:
         app.logger.error('error:' + str(e))
-        return json.dumps({'status': 500, 'message': '系统错误'})
+        return json.dumps({'status': 500, 'message': '系统错误','args':0})
 
 
 @app.route('/home_new', methods=['GET'])
@@ -665,11 +665,11 @@ def get_home_new():
         new_list, new_list_count = get_head_tn_list0(page)
         add_hot_new_data(str(new_list))
         app.logger.info('主页最新发表游记')
-        return json.dumps({'status': 200, 'new_data': new_list, 'new_count': new_list_count},
+        return json.dumps({'status': 200, 'new_data': new_list, 'new_count': new_list_count,'args':1},
                           ensure_ascii=False)
     except Exception as e:
         app.logger.error('error:' + str(e))
-        return json.dumps({'status': 500, 'message': '系统错误'})
+        return json.dumps({'status': 500, 'message': '系统错误','args':0})
 
 
 @app.route('/youji', methods=['GET'])
@@ -702,11 +702,11 @@ def get_youji():
         app.logger.info('游记内容抓取')
         add_youji(str(contentHead), str(contentText), contentDetail)
         return json.dumps(
-            {'status': 200, 'contentHead': contentHead, 'contentText': contentText, 'contentDetail': contentDetail},
+            {'status': 200, 'contentHead': contentHead, 'contentText': contentText, 'contentDetail': contentDetail,'args':1},
             ensure_ascii=False)
     except Exception as e:
         app.logger.error('error:' + str(e))
-        return json.dumps({'status': 500, 'message': '系统错误'})
+        return json.dumps({'status': 500, 'message': '系统错误','args':0})
 
 
 @app.route('/youji_related', methods=['GET'])
@@ -768,10 +768,10 @@ def youji_related():
             view = li.xpath('a[@class="_j_mddrel_gl_item"]/span/text()')[0]
             youji_list.append({'key': key, 'title': title, 'href': href, 'view': view, 'src': src})
             li_index = li_index + 1
-        return json.dumps({'mdd': mdd, 'gonglve': gonglve, 'youji': youji_list, 'status': 200}, ensure_ascii=False)
+        return json.dumps({'mdd': mdd, 'gonglve': gonglve, 'youji': youji_list, 'status': 200,'args':1}, ensure_ascii=False)
     except Exception as e:
         app.logger.info('error:' + str(e))
-        return json.dumps({'status': 500, 'message': '系统错误'}, ensure_ascii=False)
+        return json.dumps({'status': 500, 'message': '系统错误','args':0}, ensure_ascii=False)
 
 
 @app.route('/mdd', methods=['GET'])
@@ -788,11 +788,11 @@ def get_destination():
         add_destination(str(head), str(hot_poi_result), str(season_recommend))
         app.logger.info("目的地页面的抓取")
         return json.dumps(
-            {'status': 200, 'head': head, 'season_recommend': season_recommend, 'hot_poi_result': hot_poi_result},
+            {'status': 200, 'head': head, 'season_recommend': season_recommend, 'hot_poi_result': hot_poi_result,'args':1},
             ensure_ascii=False)
     except Exception as e:
         app.logger.error('error:' + str(e))
-        return json.dumps({'status': 500, 'message': '系统错误'})
+        return json.dumps({'status': 500, 'message': '系统错误','args':0})
 
 
 @app.route('/gong_lve', methods=['GET'])
@@ -808,11 +808,11 @@ def get_gong_lve():
         content = result[2]['content']
         add_gong_lve(str(nav_left), str(nav_right_img), str(content))
         app.logger.info('攻略页面的抓取')
-        return json.dumps({'status': 200, 'gonglve_nav': nav_left, 'dataimg': nav_right_img, 'content': content},
+        return json.dumps({'status': 200, 'gonglve_nav': nav_left, 'dataimg': nav_right_img, 'content': content,'args':1},
                           ensure_ascii=False)
     except Exception as e:
         app.logger.info('error:' + str(e))
-        return json.dumps({'status': 500, 'message': '系统错误'})
+        return json.dumps({'status': 500, 'message': '系统错误','args':0})
 
 
 @app.route('/ziyouxing', methods=['GET'])
@@ -837,10 +837,10 @@ def wenda():
             {'status': 200, 'mdd': mdd, 'mdd_href': mdd_href, 'title': title, 'detail': detail, 'tags': tags,
              'user_name': user.get('user_name'), 'user_href': user.get('user_href'), 'user_img': user.get('user_img'),
              'time': time, 'liulan_num': liulan_num, 'guanzhu_num': guanzhu_num, 'num': num,
-             'answer_list': answer_list}, ensure_ascii=False)
+             'answer_list': answer_list,'args':1}, ensure_ascii=False)
     except Exception as e:
         app.logger.info("error:" + str(e))
-        return json.dumps({'status': 200, 'message': '系统错误', 'args': 0}, ensure_ascii=False)
+        return json.dumps({'status': 500, 'message': '系统错误', 'args': 0}, ensure_ascii=False)
 
 
 @app.route('/wenda_related', methods=['GET'])
