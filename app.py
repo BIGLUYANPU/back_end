@@ -59,7 +59,7 @@ def login_success():
     account = session.get('account')
     user = session.get('user')
     if user is None or account is None:
-        return json.dumps({'status': 401, 'message': '没有登录'}, ensure_ascii=False)
+        return json.dumps({'status': 401, 'message': '没有登录','args':0}, ensure_ascii=False)
     user = pickle.loads(user)
     # 得到用户最后一次打卡的时间
     daka = True
@@ -76,7 +76,7 @@ def login_success():
         # 如果天数不同，则没有打卡
         if days != 0:
             daka = False
-    return json.dumps({'status': 200, 'message': '登录成功', 'daka': daka}, ensure_ascii=False)
+    return json.dumps({'status': 200, 'message': '登录成功', 'daka': daka,'args':1}, ensure_ascii=False)
 
 
 @app.route('/user_login', methods=['POST'])
@@ -100,7 +100,7 @@ def user_login():
             if user_account is None:
                 # 没有用户
                 app.logger.info(account + '登录失败,' + 'error:' + '没有' + account)
-                return json.dumps({'status': 200, 'message': '用户名没有注册,请先注册'}, ensure_ascii=False)
+                return json.dumps({'status': 200, 'message': '用户名没有注册,请先注册','args':0}, ensure_ascii=False)
             # 对输入密码进行加密
             hash_password = encryption(password, user_account.salt)
             # 输入密码的加密版和数据库的密码进行比对
@@ -119,17 +119,17 @@ def user_login():
                 # print(session[str(user_account.id)])
                 app.logger.info(account + '登录成功')
                 return json.dumps(
-                    {'status': 200, 'message': '登录成功'}, ensure_ascii=False)
+                    {'status': 200, 'message': '登录成功','args':1}, ensure_ascii=False)
             else:
                 logging.info(account + '登录失败,' + 'error:密码错误')
                 return json.dumps(
-                    {'status': 200, 'message': '用户名或密码错误'}, ensure_ascii=False)
+                    {'status': 200, 'message': '用户名或密码错误','args':0}, ensure_ascii=False)
         else:
             return json.dumps(
-                {'status': 200, 'message': '参数错误'}, ensure_ascii=False)
+                {'status': 200, 'message': '参数错误','args':0}, ensure_ascii=False)
     except Exception as e:
         app.logger.error('error:' + str(e))
-        json.dumps({'status': 500, 'message': '系统错误'}, ensure_ascii=False)
+        json.dumps({'status': 500, 'message': '系统错误','args':0}, ensure_ascii=False)
 
 
 @app.route('/quit', methods=['GET'])
@@ -198,10 +198,10 @@ def to_user_send_mail():
         # 过期时间5分钟
         redis_con.expire(usermail + 'code', 300)
         app.logger.info('邮件发送成功')
-        return json.dumps({'status': 200, 'message': '验证码发送成功'}, ensure_ascii=False)
+        return json.dumps({'status': 200, 'message': '验证码发送成功','args':1}, ensure_ascii=False)
     except Exception as e:
         app.logger.error('error:' + str(e))
-        return json.dumps({'status': 200, 'message': '验证码发送失败'}, ensure_ascii=False)
+        return json.dumps({'status': 200, 'message': '验证码发送失败','args':0}, ensure_ascii=False)
 
 
 @app.route('/reset_mail', methods=['GET'])
@@ -231,10 +231,10 @@ def to_user_send_reset_mail():
         # 过期时间5分钟
         redis_con.expire(usermail + 'code', 300)
         app.logger.info('邮件发送成功')
-        return json.dumps({'status': 200, 'message': '验证码发送成功'}, ensure_ascii=False)
+        return json.dumps({'status': 200, 'message': '验证码发送成功','args':0}, ensure_ascii=False)
     except Exception as e:
         app.logger.error('error:' + str(e))
-        return json.dumps({'status': 200, 'message': '验证码发送失败'}, ensure_ascii=False)
+        return json.dumps({'status': 200, 'message': '验证码发送失败','args':0}, ensure_ascii=False)
 
 
 @app.route('/regist', methods=['POST'])
@@ -254,7 +254,7 @@ def user_register():
         # 验证码
         usercode = data_json.get('code')
         if usermail is None or password is None or name is None or usercode is None:
-            return json.dumps({'status': 400, 'args': 0, 'message': '密码或账号不能为空'}, ensure_ascii=False)
+            return json.dumps({'status': 400, 'args': 0, 'message': '密码或账号不能为空','args':0}, ensure_ascii=False)
         if redis_con.get(usermail + 'code') is None:
             app.logger.info(usermail + '验证码失效')
             return json.dumps({'status': 200, 'message': '验证码已经过期', 'args': 0}, ensure_ascii=False)
@@ -282,7 +282,7 @@ def user_register():
             return json.dumps({'status': 200, 'message': '注册成功', 'args': 1}, ensure_ascii=False)
     except Exception as e:
         app.logger.error('error' + str(e))
-        return json.dumps({'status': 500, 'message': '系统错误'}, ensure_ascii=False)
+        return json.dumps({'status': 500, 'message': '系统错误','args':0}, ensure_ascii=False)
 
 
 @app.route('/code_ver', methods=['POST'])
@@ -393,7 +393,7 @@ def percent():
         count = count + 1
     if user.honey is None:
         count = count + 1
-    return json.dumps({'status': 200, 'percentage': int(float('%.2f' % (count / 13)) * 100)}, ensure_ascii=False)
+    return json.dumps({'status': 200, 'percentage': int(float('%.2f' % (count / 13)) * 100),'args':1}, ensure_ascii=False)
 
 
 @app.route('/option', methods=['GET', 'POST'])
@@ -414,7 +414,7 @@ def option():
             app.logger.info(account + '用户个人信息首页查询')
             return json.dumps({'status': 200, 'user': {'name': user.name, 'city': user.city, 'sex': user.sex,
                                                        'birthday': birthday,
-                                                       'introduction': user.introduction}}, ensure_ascii=False)
+                                                       'introduction': user.introduction},'args':1}, ensure_ascii=False)
         else:
             data_json = request.get_json()
             data_key = dict(data_json).keys()
@@ -450,10 +450,10 @@ def option():
             # 重新放到session里
             session['user'] = pickle.dumps(select_user(user_id))
             app.logger.info(account + '用户修改个人信息')
-            return json.dumps({'status': 200, 'message': '修改成功'}, ensure_ascii=False)
+            return json.dumps({'status': 200, 'message': '修改成功','args':1}, ensure_ascii=False)
     except Exception as e:
         app.logger.error('error:' + str(e))
-        return json.dumps({'status': 200, 'message': '修改失败'}, ensure_ascii=False)
+        return json.dumps({'status': 200, 'message': '修改失败','args':0}, ensure_ascii=False)
 
 
 @app.route('/user_img_up', methods=['POST'])
@@ -567,7 +567,7 @@ def user_safe():
             ensure_ascii=False)
     except Exception as e:
         app.logger.info('error:' + str(e))
-        return json.dumps({'status': 500, 'message': '系统错误'}, ensure_ascii=False)
+        return json.dumps({'status': 500, 'message': '系统错误','args':0}, ensure_ascii=False)
 
 
 @app.route('/user_url', methods=['GET'])
@@ -824,7 +824,7 @@ def ziyouxing():
         return json.dumps({'status': 200, 'ziyouxingl': ziyouxingl, 'location': location, 'ziyouxingr': ziyouxingr,
                            'ziyouxing_related': ziyouxing_related, 'args': 1}, ensure_ascii=False)
     except Exception as e:
-        app.logger.infor('error:' + str(e))
+        app.logger.info('error:' + str(e))
         return json.dumps({'status': 500, 'message': '系统错误', 'args': 0})
 
 
