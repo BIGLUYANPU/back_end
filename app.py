@@ -129,7 +129,7 @@ def user_login():
                 {'status': 200, 'message': '参数错误','args':0}, ensure_ascii=False)
     except Exception as e:
         app.logger.error('error:' + str(e))
-        json.dumps({'status': 500, 'message': '系统错误','args':0}, ensure_ascii=False)
+        return json.dumps({'status': 500, 'message': '系统错误','args':0}, ensure_ascii=False)
 
 
 @app.route('/quit', methods=['GET'])
@@ -321,6 +321,8 @@ def account_verification():
     :return:
     """
     try:
+        session.permanent = True
+        app.permanent_session_lifetime = timedelta(days=7)
         data_json = request.get_json()
         account = data_json.get('account')
         if account is None:

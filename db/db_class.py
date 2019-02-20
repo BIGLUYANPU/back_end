@@ -1,5 +1,5 @@
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import Column, String, Integer, DateTime, VARBINARY, Text
+from sqlalchemy import Column, String, Integer, DateTime, BINARY, Text
 from sqlalchemy import create_engine
 from sqlalchemy.sql import func
 from db.db_con import *
@@ -59,8 +59,8 @@ class UserAccount(BaseModel):
     }
     id = Column(Integer, primary_key=True, autoincrement=True)
     account = Column(String(50))
-    password = Column(String(50))
-    salt = Column(VARBINARY(64))
+    password = Column(String(64))
+    salt = Column(BINARY(64))
     # status = Column(Integer)
 
 
