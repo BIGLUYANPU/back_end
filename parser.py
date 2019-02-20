@@ -50,7 +50,7 @@ def gong_lve_parser():
                     for a in dd:
                         a_text = a.attrib['title']
                         a_href = a.attrib['href']
-                        dd_a_list.append({'place': a_text, 'place_url': a_href})
+                        dd_a_list.append({'place': a_text, 'place_url': 'https://www.mafengwo.cn'+a_href})
                     li_list.append({'topic': dt, 'places': dd_a_list})
             # 如果不是主题推荐这个div
             else:
@@ -58,14 +58,15 @@ def gong_lve_parser():
                 for li in nav_li:
                     li_strong = li.xpath('strong/a/text()')[0]
                     li_text = li.xpath('a/text()')[0]
-                    li_list.append({'title': li_strong, 'desc': li_text, 'place_url': ''})
+                    place_url = li.xpath('a/@href')[0]
+                    li_list.append({'title': li_strong, 'desc': li_text, 'place_url': 'https://www.mafengwo.cn'+place_url})
             nav_list.append({'title': li_title, 'content': li_list})
         result.append({'nav': nav_list})
         # 头部解析 (右侧的图片)
         li_slide = selector.xpath('//div[@class="slide"]/ul[@id="slide_box"]/li')
         nav_img = []
         for li in li_slide:
-            nav_img.append({'src': li.xpath('a/img/@src')[0], 'href': ''})
+            nav_img.append({'src': li.xpath('a/img/@src')[0], 'href': 'https://www.mafengwo.cn'+li.xpath('a/@href')[0]})
         result.append({'img': nav_img})
         # 默认是显示10篇   数据来源有三种对应不同的解析
         # 正文部分解析
@@ -475,6 +476,7 @@ def get_head_parser(url, headers):
             tn_user_url = selector.xpath(
                 'div[@class="tn-wrapper"]/div[@class="tn-extra"]/span[@class="tn-user"]/a/@href')[0]
             tn_nums = selector.xpath('div[@class="tn-wrapper"]/div[@class="tn-extra"]/span[@class="tn-nums"]/text()')[0]
+            ding = selector.xpath('div[@class="tn-wrapper"]/div[@class="tn-extra"]/span[@class="tn-ding"]/em/text()')[0]
             data.append(
                 {'index': str(index + 1), 'raiders_url': href, 'img_url': image_src, 'title': dt,
                  'abstract': dd,
@@ -483,7 +485,7 @@ def get_head_parser(url, headers):
                  'user_name': tn_user,
                  'user_url': tn_user_url,
                  'nums': tn_nums,
-                 'ding': ''})
+                 'ding': ding})
             index = index + 1
         return data, count
     except Exception as e:

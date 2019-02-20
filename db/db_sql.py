@@ -212,30 +212,40 @@ def update_user_account(mail_number, password=None, salt=None):
 
 def add_daka(user_id):
     """
-
     :param user_id:user的id
     :return:
     """
     session = get_con()
     try:
-        # 得到最后一次的打卡时间
+        # 得到当前时间
         update_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
+        # 最后一次打卡时间和当前时间默认相同
         last_time = update_time
+        # days默认为1
         days = 1
+        # 如果用户不是第一次进行打卡
         if len(select_daka(user_id)) !=0:
+            # 查询最后一次的打卡记录 last_daka
             last_daka = select_daka(user_id)[-1]
+            # 得到最后一次打卡时间
             last_time = last_daka.update_time
             a = parse(update_time)
             b = parse(str(last_time))
+            # 得到当前时间和最后一次打卡的差值
             sub = (a-b).days
             # 连续打卡了
             if sub <=1:
+                # 连续打卡的天数加一
                 if last_daka.days is not None:
                     days = last_daka.days+1
+        # 计算蜂蜜增加的数量
         num = days%7 if days%7!=0 else 7
+        # 得到用户
         user = select_user_by_Id(user_id)
+        # 增加的蜂蜜
         honey = user.honey+num
         add_user(user.user_id,honey=honey)
+        # 添加打卡记录
         daka = DaKa(user_id=user_id,update_time=update_time,last_time=last_time,days=days,status=1)
         session.add(daka)
         session.commit()

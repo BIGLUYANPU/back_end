@@ -56,17 +56,26 @@ def login_success():
     判断是否为登录状态
     :return:daka是True代表今天打卡
     """
-    account = session.get('account')
-    user = session.get('user')
-    if user is None or account is None:
-        return json.dumps({'status': 401, 'message': '没有登录'}, ensure_ascii=False)
-    user = pickle.loads(user)
-    update_time = select_daka(user.id)[-1].update_time
-    time_now = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
-    days = (parse(time_now) - parse(str(update_time))).days
+    # account = session.get('account')
+    # user = session.get('user')
+    # if user is None or account is None:
+    #     return json.dumps({'status': 401, 'message': '没有登录'}, ensure_ascii=False)
+    # user = pickle.loads(user)
+    # 得到用户最后一次打卡的时间
     daka = True
-    if days != 0:
+    daka_list = select_daka(2)
+    if len(daka_list) == 0:
         daka = False
+    else:
+        update_time = select_daka(2)[-1].update_time
+        # 得到当前时间
+        time_now = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
+        # 得到当前时间和用户最后一次打卡时间的差值
+        days = (parse(time_now) - parse(str(update_time))).days
+        # 默认为True 打卡
+        # 如果天数不同，则没有打卡
+        if days != 0:
+            daka = False
     return json.dumps({'status': 200, 'message': '登录成功', 'daka': daka}, ensure_ascii=False)
 
 
@@ -610,8 +619,8 @@ def daka():
     :return:
     """
     try:
-        user = pickle.loads(session.get('user'))
-        num = add_daka(user.id)
+        # user = pickle.loads(session.get('user'))
+        num = add_daka(1)
         app.logger.info(str(session.get('account')) + '打卡成功')
         return json.dumps({'status': 200, 'message': '打卡成功', 'args': 1, 'num': num}, ensure_ascii=False)
     except Exception as e:
