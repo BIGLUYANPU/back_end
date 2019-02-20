@@ -1,4 +1,3 @@
-from db.db_con import *
 from datetime import datetime
 from dateutil.parser import parse
 from db.db_class import *
@@ -277,7 +276,7 @@ def add_hot_data_img(hot_data, hot_img):
     session = get_con()
     try:
         print(datetime.now())
-        new_hot_data_img = HomeDataImg(hot_data=hot_data, hot_img=hot_img, update_time=datetime.now())
+        new_hot_data_img = HomeDataImg(hot_data=hot_data, hot_img=hot_img)
         session.add(new_hot_data_img)
         session.commit()
     except Exception as e:
@@ -295,7 +294,7 @@ def add_hot_new_data(new_data):
     session = get_con()
     try:
         print(datetime.now())
-        new_hot_new_data = HomeNewData(new_data=new_data, update_time=datetime.now())
+        new_hot_new_data = HomeNewData(new_data=new_data)
         session.add(new_hot_new_data)
         session.commit()
     except Exception as e:
@@ -312,8 +311,7 @@ def add_youji(content_head, content_text, content_detail):
     """
     session = get_con()
     try:
-        new_content = YouJi(content_head=content_head, content_text=content_text, content_detail=content_detail,
-                            update_time=datetime.now())
+        new_content = YouJi(content_head=content_head, content_text=content_text, content_detail=content_detail)
         session.add(new_content)
         session.commit()
     except Exception as e:
@@ -333,7 +331,7 @@ def add_destination(head_img_info, hot_poi_info, season_recommend):
     session = get_con()
     try:
         new_destination = Destination(head_img_info=head_img_info, hot_poi_info=hot_poi_info,
-                                      season_recommend=season_recommend, update_time=datetime.now())
+                                      season_recommend=season_recommend)
         session.add(new_destination)
         session.commit()
     except Exception as e:
@@ -353,7 +351,7 @@ def add_gong_lve(nav_left, nav_right_img, content):
     session = get_con()
     try:
         new_gong_lve = GongLve(nav_left=nav_left, nav_right_img=nav_right_img,
-                               content=content, update_time=datetime.now())
+                               content=content)
         session.add(new_gong_lve)
         session.commit()
     except Exception as e:
