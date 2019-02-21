@@ -359,6 +359,26 @@ def add_gong_lve(nav_left, nav_right_img, content):
     finally:
         session.close()
 
+def add_write_gonglve(user_id,content):
+    session = get_con()
+    try:
+        write_gonglve = WriteGongLve(user_id = user_id,content = content)
+        session.add(write_gonglve)
+        session.commit()
+    except Exception as e:
+        print(e)
+    finally:
+        session.close()
+
+def select_write_gonglve(user_id):
+    session = get_con()
+    try:
+        write_gonglve_list = session.query(WriteGongLve).filter(WriteGongLve.user_id == user_id).all()
+        return write_gonglve_list
+    except Exception as e:
+        print(e)
+    finally:
+        session.close()
 
 if __name__ == '__main__':
     # a = parse('2018-10-10 12:02:11')

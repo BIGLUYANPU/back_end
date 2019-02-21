@@ -309,7 +309,7 @@ def destination_parser():
         req = requests.get(url, headers=headers)
         html = json.loads(req.text)['data']['html']
         selector = fromstring(html)
-        season_recommend = {}
+        season_recommend = []
         div_tiles_col_list = []
         div_tiles_col = selector.xpath('//div[@class="tiles"]/div[contains(@class,"item")]')
         for col in div_tiles_col:
@@ -320,7 +320,7 @@ def destination_parser():
             if len(title) == 0:
                 title = '更多'
             div_tiles_col_list.append({'src': src, 'title': title})
-        season_recommend['1'] = div_tiles_col_list
+        season_recommend.append({'key':1,'detail':div_tiles_col_list})
         div_tiles_col_list = []
         tiles_hide_count = 2
         tiles_hide = selector.xpath('//div[@class="tiles hide"]')
@@ -332,7 +332,7 @@ def destination_parser():
                 if len(title) == 0:
                     title = '更多'
                 div_tiles_col_list.append({'src': src, 'title': title})
-            season_recommend[str(tiles_hide_count)] = div_tiles_col_list
+            season_recommend.append({'key':tiles_hide_count,'detail':div_tiles_col_list})
             div_tiles_col_list = []
             tiles_hide_count = tiles_hide_count + 1
         # 当季推荐解析完成

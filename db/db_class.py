@@ -156,9 +156,21 @@ class GongLve(BaseModel):
     content = Column(Text)
     update_time = Column(DateTime, nullable=False, server_default=func.now())
 
-
+class WriteGongLve(BaseModel):
+    __tablename__ = 'write_gonglve'
+    __table_args__ = {
+        'mysql_engine': 'InnoDB',
+        'mysql_character_set': 'utf8mb4',
+        'mysql_collate': 'utf8mb4_bin',
+        'mysql_auto_increment': '1',
+        'mysql_row_format': 'Compact'
+    }
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    user_id = Column(Integer)
+    content = Column(Text)
+    update_time = Column(DateTime, nullable=False, server_default=func.now())
 if __name__ == '__main__':
     # 删除所有的表,有需要使用
-    BaseModel.metadata.drop_all(engine)
+    # BaseModel.metadata.drop_all(engine)
     # 数据库没有的表会创建，有的不会删除
     BaseModel.metadata.create_all(engine)

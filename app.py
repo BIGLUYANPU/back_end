@@ -59,7 +59,7 @@ def login_success():
     account = session.get('account')
     user = session.get('user')
     if user is None or account is None:
-        return json.dumps({'status': 401, 'message': '没有登录','args':0}, ensure_ascii=False)
+        return json.dumps({'status': 401, 'message': '没有登录', 'args': 0}, ensure_ascii=False)
     user = pickle.loads(user)
     # 得到用户最后一次打卡的时间
     daka = True
@@ -76,7 +76,7 @@ def login_success():
         # 如果天数不同，则没有打卡
         if days != 0:
             daka = False
-    return json.dumps({'status': 200, 'message': '登录成功', 'daka': daka,'args':1}, ensure_ascii=False)
+    return json.dumps({'status': 200, 'message': '登录成功', 'daka': daka, 'args': 1}, ensure_ascii=False)
 
 
 @app.route('/user_login', methods=['POST'])
@@ -100,7 +100,7 @@ def user_login():
             if user_account is None:
                 # 没有用户
                 app.logger.info(account + '登录失败,' + 'error:' + '没有' + account)
-                return json.dumps({'status': 200, 'message': '用户名没有注册,请先注册','args':0}, ensure_ascii=False)
+                return json.dumps({'status': 200, 'message': '用户名没有注册,请先注册', 'args': 0}, ensure_ascii=False)
             # 对输入密码进行加密
             hash_password = encryption(password, user_account.salt)
             # 输入密码的加密版和数据库的密码进行比对
@@ -119,17 +119,17 @@ def user_login():
                 # print(session[str(user_account.id)])
                 app.logger.info(account + '登录成功')
                 return json.dumps(
-                    {'status': 200, 'message': '登录成功','args':1}, ensure_ascii=False)
+                    {'status': 200, 'message': '登录成功', 'args': 1}, ensure_ascii=False)
             else:
                 logging.info(account + '登录失败,' + 'error:密码错误')
                 return json.dumps(
-                    {'status': 200, 'message': '用户名或密码错误','args':0}, ensure_ascii=False)
+                    {'status': 200, 'message': '用户名或密码错误', 'args': 0}, ensure_ascii=False)
         else:
             return json.dumps(
-                {'status': 200, 'message': '参数错误','args':0}, ensure_ascii=False)
+                {'status': 200, 'message': '参数错误', 'args': 0}, ensure_ascii=False)
     except Exception as e:
         app.logger.error('error:' + str(e))
-        return json.dumps({'status': 500, 'message': '系统错误','args':0}, ensure_ascii=False)
+        return json.dumps({'status': 500, 'message': '系统错误', 'args': 0}, ensure_ascii=False)
 
 
 @app.route('/quit', methods=['GET'])
@@ -198,10 +198,10 @@ def to_user_send_mail():
         # 过期时间5分钟
         redis_con.expire(usermail + 'code', 300)
         app.logger.info('邮件发送成功')
-        return json.dumps({'status': 200, 'message': '验证码发送成功','args':1}, ensure_ascii=False)
+        return json.dumps({'status': 200, 'message': '验证码发送成功', 'args': 1}, ensure_ascii=False)
     except Exception as e:
         app.logger.error('error:' + str(e))
-        return json.dumps({'status': 200, 'message': '验证码发送失败','args':0}, ensure_ascii=False)
+        return json.dumps({'status': 200, 'message': '验证码发送失败', 'args': 0}, ensure_ascii=False)
 
 
 @app.route('/reset_mail', methods=['GET'])
@@ -231,10 +231,10 @@ def to_user_send_reset_mail():
         # 过期时间5分钟
         redis_con.expire(usermail + 'code', 300)
         app.logger.info('邮件发送成功')
-        return json.dumps({'status': 200, 'message': '验证码发送成功','args':0}, ensure_ascii=False)
+        return json.dumps({'status': 200, 'message': '验证码发送成功', 'args': 0}, ensure_ascii=False)
     except Exception as e:
         app.logger.error('error:' + str(e))
-        return json.dumps({'status': 200, 'message': '验证码发送失败','args':0}, ensure_ascii=False)
+        return json.dumps({'status': 200, 'message': '验证码发送失败', 'args': 0}, ensure_ascii=False)
 
 
 @app.route('/regist', methods=['POST'])
@@ -254,7 +254,7 @@ def user_register():
         # 验证码
         usercode = data_json.get('code')
         if usermail is None or password is None or name is None or usercode is None:
-            return json.dumps({'status': 400, 'args': 0, 'message': '密码或账号不能为空','args':0}, ensure_ascii=False)
+            return json.dumps({'status': 400, 'args': 0, 'message': '密码或账号不能为空', 'args': 0}, ensure_ascii=False)
         if redis_con.get(usermail + 'code') is None:
             app.logger.info(usermail + '验证码失效')
             return json.dumps({'status': 200, 'message': '验证码已经过期', 'args': 0}, ensure_ascii=False)
@@ -282,7 +282,7 @@ def user_register():
             return json.dumps({'status': 200, 'message': '注册成功', 'args': 1}, ensure_ascii=False)
     except Exception as e:
         app.logger.error('error' + str(e))
-        return json.dumps({'status': 500, 'message': '系统错误','args':0}, ensure_ascii=False)
+        return json.dumps({'status': 500, 'message': '系统错误', 'args': 0}, ensure_ascii=False)
 
 
 @app.route('/code_ver', methods=['POST'])
@@ -395,7 +395,8 @@ def percent():
         count = count + 1
     if user.honey is None:
         count = count + 1
-    return json.dumps({'status': 200, 'percentage': int(float('%.2f' % (count / 13)) * 100),'args':1}, ensure_ascii=False)
+    return json.dumps({'status': 200, 'percentage': int(float('%.2f' % (count / 13)) * 100), 'args': 1},
+                      ensure_ascii=False)
 
 
 @app.route('/option', methods=['GET', 'POST'])
@@ -416,7 +417,8 @@ def option():
             app.logger.info(account + '用户个人信息首页查询')
             return json.dumps({'status': 200, 'user': {'name': user.name, 'city': user.city, 'sex': user.sex,
                                                        'birthday': birthday,
-                                                       'introduction': user.introduction},'args':1}, ensure_ascii=False)
+                                                       'introduction': user.introduction}, 'args': 1},
+                              ensure_ascii=False)
         else:
             data_json = request.get_json()
             data_key = dict(data_json).keys()
@@ -452,10 +454,10 @@ def option():
             # 重新放到session里
             session['user'] = pickle.dumps(select_user(user_id))
             app.logger.info(account + '用户修改个人信息')
-            return json.dumps({'status': 200, 'message': '修改成功','args':1}, ensure_ascii=False)
+            return json.dumps({'status': 200, 'message': '修改成功', 'args': 1}, ensure_ascii=False)
     except Exception as e:
         app.logger.error('error:' + str(e))
-        return json.dumps({'status': 200, 'message': '修改失败','args':0}, ensure_ascii=False)
+        return json.dumps({'status': 200, 'message': '修改失败', 'args': 0}, ensure_ascii=False)
 
 
 @app.route('/user_img_up', methods=['POST'])
@@ -569,7 +571,7 @@ def user_safe():
             ensure_ascii=False)
     except Exception as e:
         app.logger.info('error:' + str(e))
-        return json.dumps({'status': 500, 'message': '系统错误','args':0}, ensure_ascii=False)
+        return json.dumps({'status': 500, 'message': '系统错误', 'args': 0}, ensure_ascii=False)
 
 
 @app.route('/user_url', methods=['GET'])
@@ -607,7 +609,8 @@ def user_wallet():
         user = pickle.loads(session.get('user'))
         app.logger.info(account + '用户的钱包信息')
         return json.dumps(
-            {'status': 200, 'message': '查询成功', 'user': {'money': user.money, 'honey': user.honey,'args':1}, 'args': 1},
+            {'status': 200, 'message': '查询成功', 'user': {'money': user.money, 'honey': user.honey, 'args': 1},
+             'args': 1},
             ensure_ascii=False)
     except Exception as e:
         app.logger.error('error:' + str(e))
@@ -624,6 +627,8 @@ def daka():
         user = pickle.loads(session.get('user'))
         num = add_daka(user.id)
         app.logger.info(str(session.get('account')) + '打卡成功')
+        # 蜂蜜值已经改变了 所以user需要重新获取
+        session['user'] = pickle.dumps(select_user_by_Id(user.id))
         return json.dumps({'status': 200, 'message': '打卡成功', 'args': 1, 'num': num}, ensure_ascii=False)
     except Exception as e:
         app.logger.info(session.get('account') + '打卡失败' + 'error:' + str(e))
@@ -648,11 +653,12 @@ def get_index():
         add_hot_data_img(str(hot_list), str(hot_list))
         app.logger.info('主页游记还有头图')
         return json.dumps(
-            {'status': 200,'args':1,'hot_data': hot_list, 'dataimg': show_image, 'hot_count': hot_list_count, 'filter': fil},
+            {'status': 200, 'args': 1, 'hot_data': hot_list, 'dataimg': show_image, 'hot_count': hot_list_count,
+             'filter': fil},
             ensure_ascii=False)
     except Exception as e:
         app.logger.error('error:' + str(e))
-        return json.dumps({'status': 500, 'message': '系统错误','args':0})
+        return json.dumps({'status': 500, 'message': '系统错误', 'args': 0})
 
 
 @app.route('/home_new', methods=['GET'])
@@ -667,11 +673,11 @@ def get_home_new():
         new_list, new_list_count = get_head_tn_list0(page)
         add_hot_new_data(str(new_list))
         app.logger.info('主页最新发表游记')
-        return json.dumps({'status': 200, 'new_data': new_list, 'new_count': new_list_count,'args':1},
+        return json.dumps({'status': 200, 'new_data': new_list, 'new_count': new_list_count, 'args': 1},
                           ensure_ascii=False)
     except Exception as e:
         app.logger.error('error:' + str(e))
-        return json.dumps({'status': 500, 'message': '系统错误','args':0})
+        return json.dumps({'status': 500, 'message': '系统错误', 'args': 0})
 
 
 @app.route('/youji', methods=['GET'])
@@ -704,11 +710,12 @@ def get_youji():
         app.logger.info('游记内容抓取')
         add_youji(str(contentHead), str(contentText), contentDetail)
         return json.dumps(
-            {'status': 200, 'contentHead': contentHead, 'contentText': contentText, 'contentDetail': contentDetail,'args':1},
+            {'status': 200, 'contentHead': contentHead, 'contentText': contentText, 'contentDetail': contentDetail,
+             'args': 1},
             ensure_ascii=False)
     except Exception as e:
         app.logger.error('error:' + str(e))
-        return json.dumps({'status': 500, 'message': '系统错误','args':0})
+        return json.dumps({'status': 500, 'message': '系统错误', 'args': 0})
 
 
 @app.route('/youji_related', methods=['GET'])
@@ -770,10 +777,11 @@ def youji_related():
             view = li.xpath('a[@class="_j_mddrel_gl_item"]/span/text()')[0]
             youji_list.append({'key': key, 'title': title, 'href': href, 'view': view, 'src': src})
             li_index = li_index + 1
-        return json.dumps({'mdd': mdd, 'gonglve': gonglve, 'youji': youji_list, 'status': 200,'args':1}, ensure_ascii=False)
+        return json.dumps({'mdd': mdd, 'gonglve': gonglve, 'youji': youji_list, 'status': 200, 'args': 1},
+                          ensure_ascii=False)
     except Exception as e:
         app.logger.info('error:' + str(e))
-        return json.dumps({'status': 500, 'message': '系统错误','args':0}, ensure_ascii=False)
+        return json.dumps({'status': 500, 'message': '系统错误', 'args': 0}, ensure_ascii=False)
 
 
 @app.route('/mdd', methods=['GET'])
@@ -790,11 +798,12 @@ def get_destination():
         add_destination(str(head), str(hot_poi_result), str(season_recommend))
         app.logger.info("目的地页面的抓取")
         return json.dumps(
-            {'status': 200, 'head': head, 'season_recommend': season_recommend, 'hot_poi_result': hot_poi_result,'args':1},
+            {'status': 200, 'head': head, 'season_recommend': season_recommend, 'hot_poi_result': hot_poi_result,
+             'args': 1},
             ensure_ascii=False)
     except Exception as e:
         app.logger.error('error:' + str(e))
-        return json.dumps({'status': 500, 'message': '系统错误','args':0})
+        return json.dumps({'status': 500, 'message': '系统错误', 'args': 0})
 
 
 @app.route('/gong_lve', methods=['GET'])
@@ -810,11 +819,12 @@ def get_gong_lve():
         content = result[2]['content']
         add_gong_lve(str(nav_left), str(nav_right_img), str(content))
         app.logger.info('攻略页面的抓取')
-        return json.dumps({'status': 200, 'gonglve_nav': nav_left, 'dataimg': nav_right_img, 'content': content,'args':1},
-                          ensure_ascii=False)
+        return json.dumps(
+            {'status': 200, 'gonglve_nav': nav_left, 'dataimg': nav_right_img, 'content': content, 'args': 1},
+            ensure_ascii=False)
     except Exception as e:
         app.logger.info('error:' + str(e))
-        return json.dumps({'status': 500, 'message': '系统错误','args':0})
+        return json.dumps({'status': 500, 'message': '系统错误', 'args': 0})
 
 
 @app.route('/ziyouxing', methods=['GET'])
@@ -834,16 +844,19 @@ def ziyouxing():
 def wenda():
     try:
         id = request.values.get('id')
-        if id is None or id =='':
-            hot_question,new_question,wait_question = wenda_parser()
-            return json.dumps({'status':200,'args':1,'hot_question':hot_question,'new_question':new_question,'wait_question':wait_question},ensure_ascii=False)
+        if id is None or id == '':
+            hot_question, new_question, wait_question = wenda_parser()
+            return json.dumps({'status': 200, 'args': 1, 'hot_question': hot_question, 'new_question': new_question,
+                               'wait_question': wait_question}, ensure_ascii=False)
         else:
-            mdd, mdd_href, title, detail, tags, user, time, liulan_num, guanzhu_num, num, answer_list = wenda_detail_parser(id)
+            mdd, mdd_href, title, detail, tags, user, time, liulan_num, guanzhu_num, num, answer_list = wenda_detail_parser(
+                id)
             return json.dumps(
                 {'status': 200, 'mdd': mdd, 'mdd_href': mdd_href, 'title': title, 'detail': detail, 'tags': tags,
-                 'user_name': user.get('user_name'), 'user_href': user.get('user_href'), 'user_img': user.get('user_img'),
+                 'user_name': user.get('user_name'), 'user_href': user.get('user_href'),
+                 'user_img': user.get('user_img'),
                  'time': time, 'liulan_num': liulan_num, 'guanzhu_num': guanzhu_num, 'num': num,
-                 'answer_list': answer_list,'args':1}, ensure_ascii=False)
+                 'answer_list': answer_list, 'args': 1}, ensure_ascii=False)
     except Exception as e:
         app.logger.info("error:" + str(e))
         return json.dumps({'status': 500, 'message': '系统错误', 'args': 0}, ensure_ascii=False)
@@ -854,10 +867,24 @@ def wenda_related():
     try:
         id = request.values.get('id')
         activity, related_questions = wenda_related_parser(id)
-        return json.dumps({'status':200,'args':1,'activity':activity,'related_questions':related_questions},ensure_ascii=False)
+        return json.dumps({'status': 200, 'args': 1, 'activity': activity, 'related_questions': related_questions},
+                          ensure_ascii=False)
     except Exception as e:
-        app.logger.info('error:'+str(e))
-        return json.dumps({'status':500,'args':0},ensure_ascii=False)
+        app.logger.info('error:' + str(e))
+        return json.dumps({'status': 500, 'args': 0}, ensure_ascii=False)
+
+
+@app.route('/write_gonglve', methods=['POST'])
+def write_gonglve():
+    try:
+        data = request.get_json()
+        content = data.get('content')
+        user = pickle.loads(session['user'])
+        add_write_gonglve(user.id, content)
+        return json.dumps({'status': 200, 'args': 1}, ensure_ascii=False)
+    except Exception as e:
+        app.logger.info('error:' + str(e))
+        return json.dumps({'status': 500, 'args': 0}, ensure_ascii=False)
 
 
 if __name__ == '__main__':
