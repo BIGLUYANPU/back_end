@@ -834,12 +834,16 @@ def ziyouxing():
 def wenda():
     try:
         id = request.values.get('id')
-        mdd, mdd_href, title, detail, tags, user, time, liulan_num, guanzhu_num, num, answer_list = wenda_parser(id)
-        return json.dumps(
-            {'status': 200, 'mdd': mdd, 'mdd_href': mdd_href, 'title': title, 'detail': detail, 'tags': tags,
-             'user_name': user.get('user_name'), 'user_href': user.get('user_href'), 'user_img': user.get('user_img'),
-             'time': time, 'liulan_num': liulan_num, 'guanzhu_num': guanzhu_num, 'num': num,
-             'answer_list': answer_list,'args':1}, ensure_ascii=False)
+        if id is None or id =='':
+            hot_question,new_question,wait_question = wenda_parser()
+            return json.dumps({'status':200,'args':1,'hot_question':hot_question,'new_question':new_question,'wait_question':wait_question},ensure_ascii=False)
+        else:
+            mdd, mdd_href, title, detail, tags, user, time, liulan_num, guanzhu_num, num, answer_list = wenda_detail_parser(id)
+            return json.dumps(
+                {'status': 200, 'mdd': mdd, 'mdd_href': mdd_href, 'title': title, 'detail': detail, 'tags': tags,
+                 'user_name': user.get('user_name'), 'user_href': user.get('user_href'), 'user_img': user.get('user_img'),
+                 'time': time, 'liulan_num': liulan_num, 'guanzhu_num': guanzhu_num, 'num': num,
+                 'answer_list': answer_list,'args':1}, ensure_ascii=False)
     except Exception as e:
         app.logger.info("error:" + str(e))
         return json.dumps({'status': 500, 'message': '系统错误', 'args': 0}, ensure_ascii=False)
