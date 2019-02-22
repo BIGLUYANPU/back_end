@@ -552,9 +552,15 @@ def user_wallet():
         if account is None:
             return json.dumps({'status': 401, 'args': 0}, ensure_ascii=False)
         user = pickle.loads(session.get('user'))
+        list = select_wallet_detail(user.id)
+        detail = []
+        detail_index = 1
+        for wallet_detail in list:
+            detail.append({'key':detail_index,'time':str(wallet_detail.update_time),'num':wallet_detail.add_num,'detail':wallet_detail.detail})
+            detail_index = detail_index + 1
         app.logger.info(account + '用户的钱包信息')
         return json.dumps(
-            {'status': 200, 'message': '查询成功', 'user': {'money': user.money, 'honey': user.honey, 'args': 1},
+            {'status': 200, 'message': '查询成功', 'user': {'money': user.money, 'honey': user.honey, 'args': 1,'detail':detail},
              'args': 1},
             ensure_ascii=False)
     except Exception as e:
@@ -571,6 +577,7 @@ def daka():
     try:
         user = pickle.loads(session.get('user'))
         num = add_daka(user.id)
+        add_wallet_detail(user.id,num,'打卡')
         app.logger.info(str(session.get('account')) + '打卡成功')
         # 蜂蜜值已经改变了 所以user需要重新获取
         session['user'] = pickle.dumps(select_user(id = user.id))

@@ -224,7 +224,7 @@ def add_daka(user_id):
         # 计算蜂蜜增加的数量
         num = days % 7 if days % 7 != 0 else 7
         # 得到用户
-        user = select_user(id = user_id)
+        user = select_user(id=user_id)
         # 增加的蜂蜜
         honey = user.honey + num
         update_user(user.user_id, {'honey': honey})
@@ -243,6 +243,29 @@ def select_daka(user_id):
     session = get_con()
     try:
         list = session.query(DaKa).filter(DaKa.user_id == user_id).all()
+        return list
+    except Exception as e:
+        print(e)
+    finally:
+        session.close()
+
+
+def add_wallet_detail(user_id, add_num, detail):
+    session = get_con()
+    try:
+        wallet_detail = WalletDetail(user_id=user_id, add_num=add_num, detail=detail)
+        session.add(wallet_detail)
+        session.commit()
+    except Exception as e:
+        print(e)
+    finally:
+        session.close()
+
+
+def select_wallet_detail(user_id):
+    session = get_con()
+    try:
+        list = session.query(WalletDetail).filter(WalletDetail.user_id == user_id).all()
         return list
     except Exception as e:
         print(e)
@@ -368,4 +391,4 @@ def select_write_gonglve(user_id):
 
 
 if __name__ == '__main__':
-    update_user(1, {'honey': 2})
+    add_wallet_detail(1,1,'打卡')

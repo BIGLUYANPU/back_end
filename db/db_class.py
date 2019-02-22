@@ -170,6 +170,21 @@ class WriteGongLve(BaseModel):
     title = Column(String(50))
     content = Column(Text)
     update_time = Column(DateTime, nullable=False, server_default=func.now())
+
+class WalletDetail(BaseModel):
+    __tablename__ = 'wallet_detail'
+    __table_args__ = {
+        'mysql_engine': 'InnoDB',
+        'mysql_character_set': 'utf8mb4',
+        'mysql_collate': 'utf8mb4_bin',
+        'mysql_auto_increment': '1',
+        'mysql_row_format': 'Compact'
+    }
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    user_id = Column(Integer)
+    detail = Column(String(50))
+    add_num = Column(Integer)
+    update_time = Column(DateTime, nullable=False, server_default=func.now())
 if __name__ == '__main__':
     # 删除所有的表,有需要使用
     # BaseModel.metadata.drop_all(engine)
