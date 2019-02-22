@@ -546,7 +546,6 @@ def user_wallet():
     用户的钱包
     :return:
     """
-
     try:
         account = session.get('account')
         if account is None:

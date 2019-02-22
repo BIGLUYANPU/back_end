@@ -138,5 +138,8 @@ db/db_class.py 可以实现全部删除表/创建表
 
 2.write_gonglve表 增加title
 
+3.增加wallet_detail表
 ## 优化
 1.对目前接口的重新做了次测试
+
+2./user_wallet 增加detail字段{'key':,'detail':,'num','time'}
