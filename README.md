@@ -10,7 +10,50 @@ werkzeug
 redis
 sqlalchemy
 pymysql
-
+# 所有接口一览表
+## 非用户行为和信息相关的url(爬虫获取的数据url)
+1.**问答相关**
+/wenda 方法get 获取热门问题 最新问题 待回答问题
+/wenda/detail?id= 方法get 获取具体问答
+/wenda_related?id= 方法get 获取具体问答右侧的推荐
+2.**写攻略**
+/write_gonglve 方法post 参数title(标题) content(内容)
+3.**自由行详情页面**
+/ziyouxing?id= 方法get 获取具体的自由行页面
+4.**攻略大类获取**
+/gong_lve 方法get 获取攻略推荐页面
+5.**目的地**
+/mdd 方法get 目的地页面的抓取
+6.**游记相关**
+/youji_related 方法get 游记右侧推荐
+/youji 方法get 游记页面详情
+7.**主页相关**
+/home_new 方法get 主页中间最新游记模块的抓取
+/home 方法get 主页的头图和主页的热门游记抓取
+## 用户相关接口一览表
+1.**注册前的邮箱验证**
+/account_ver 方法post 参数:account(邮箱)
+2.**注册发送邮件**
+/mail 方法get
+3.**注册**
+/regist 方法post 参数:passwd(密码) name(用户昵称) code(邮箱验证码)
+4.**用户登录检测**
+/login_success 方法get status:200 args:1 daka:True 用户登录且已经打卡
+5.**用户登录**
+/user_login  方法post 参数:account:邮箱账号 passwd:密码
+6.**用户退出**
+/quit 方法get status:200 args:1 用户退出成功
+7.**用户注销**
+/logoff  方法get status:200 args:1 用户注销成功
+8.**用户个人资料相关**
+/percentage 方法get 获得用户个人信息资料完善度
+/option 方法get和方法post
+&emsp;方法为get时:获取我的信息相关内容
+&emsp:方法为post时,用于
+/user_img 方法get和方法post
+&emsp;方法为get时:获取用户头像信息
+&emsp;方法为post时:用户上传头像
+/user_wallet 方法get 获取用户的蜂蜜数目
 # 2月20日更新日志
 ## 修改bug:
 /gong_lve /daka /home

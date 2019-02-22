@@ -167,6 +167,7 @@ class WriteGongLve(BaseModel):
     }
     id = Column(Integer, primary_key=True, autoincrement=True)
     user_id = Column(Integer)
+    title = Column(String(50))
     content = Column(Text)
     update_time = Column(DateTime, nullable=False, server_default=func.now())
 if __name__ == '__main__':

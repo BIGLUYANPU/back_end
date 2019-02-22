@@ -359,10 +359,10 @@ def add_gong_lve(nav_left, nav_right_img, content):
     finally:
         session.close()
 
-def add_write_gonglve(user_id,content):
+def add_write_gonglve(user_id,title,content):
     session = get_con()
     try:
-        write_gonglve = WriteGongLve(user_id = user_id,content = content)
+        write_gonglve = WriteGongLve(user_id = user_id,title=title,content = content)
         session.add(write_gonglve)
         session.commit()
     except Exception as e:

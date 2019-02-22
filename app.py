@@ -44,6 +44,107 @@ app.config['SECRET_KEY'] = os.urandom(6)
 # 解决跨域和cookie
 CORS(app, supports_credentials=True)
 
+@app.route('/account_ver', methods=['POST'])
+def account_verification():
+    """
+    注册页面用户名唯一性的验证
+    :return:
+    """
+    try:
+        session.permanent = True
+        app.permanent_session_lifetime = timedelta(days=7)
+        data_json = request.get_json()
+        account = data_json.get('account')
+        if account is None:
+            return json.dumps({'status': 400, 'args': 0}, ensure_ascii=False)
+        user_account = select_user_account(account)
+        if user_account is None:
+            app.logger.info(account + '用户名可以使用')
+            session['regist_account'] = account
+            return json.dumps({'status': 200, 'message': '用户名可以使用', 'args': 1}, ensure_ascii=False)
+        else:
+            app.logger.info(account + '用户名不可以使用')
+            return json.dumps({'status': 200, 'message': '用户名重复', 'args': 0}, ensure_ascii=False)
+    except Exception as e:
+        app.logger.error('error' + str(e))
+        return json.dumps({'status': 500, 'message': '系统错误', 'args': 0}, ensure_ascii=False)
+@app.route('/mail', methods=['GET'])
+def to_user_send_mail():
+    """
+    注册,邮件发送验证码
+    :return:
+    """
+    try:
+        # 获取用户名
+        usermail = session.get('regist_account')
+        if usermail is None:
+            app.logger.info('缺失account参数')
+            return json.dumps({'status': 200, 'message': '参数错误', 'args': 0}, ensure_ascii=False)
+        # 获取验证码
+        code = ''
+        for i in range(0, 4):
+            code = code + str(random.randrange(0, 10))
+        # 邮件的标题
+        title = "注册激活"
+        # 邮件的内容
+        text = '<p>尊敬的' + usermail + '您的验证码为:' + code + '(有效期为5分钟)' + '</p>'
+        # 发送邮件
+        send_mail(mail, usermail, title, text)
+        # 二进制形式存储key value
+        redis_con.set(usermail + 'code', code)
+        # 过期时间5分钟
+        redis_con.expire(usermail + 'code', 300)
+        app.logger.info('邮件发送成功')
+        return json.dumps({'status': 200, 'message': '验证码发送成功', 'args': 1}, ensure_ascii=False)
+    except Exception as e:
+        app.logger.error('error:' + str(e))
+        return json.dumps({'status': 200, 'message': '验证码发送失败', 'args': 0}, ensure_ascii=False)
+@app.route('/regist', methods=['POST'])
+def user_register():
+    """
+    用户注册
+    :return:
+    """
+    try:
+        data_json = request.get_json()
+        # 获取用户名
+        usermail = session.get('regist_account')
+        # 获取密码
+        password = data_json.get('passwd')
+        # 获取昵称
+        name = data_json.get('name')
+        # 验证码
+        usercode = data_json.get('code')
+        if usermail is None or password is None or name is None or usercode is None:
+            return json.dumps({'status': 400, 'args': 0, 'message': '密码或账号不能为空',}, ensure_ascii=False)
+        if redis_con.get(usermail + 'code') is None:
+            app.logger.info(usermail + '验证码失效')
+            return json.dumps({'status': 200, 'message': '验证码已经过期', 'args': 0}, ensure_ascii=False)
+        else:
+            # 获取验证码
+            code = redis_con.get(usermail + 'code').decode('utf-8')
+            # 验证码校验不成功
+            if usercode != code:
+                app.logger.info(usermail + '验证码验证失败')
+                return json.dumps({'status': 200, 'message': '验证码输入错误', 'args': 0}, ensure_ascii=False)
+            salt = os.urandom(64)
+            hash_password = encryption(password, salt)
+            # 账号的存储
+            add_user_account(usermail, hash_password, salt)
+            # 用户名的添加
+            user_account = select_user_account(usermail)
+            # 生成uid
+            uid = ''
+            for i in range(0, 8):
+                uid = uid + str(random.randint(0, 9))
+            add_user(user_account.id, uid=int(uid), name=name,img='deful.jpeg')
+            # 用户个人信息存储到session里
+            session['user'] = pickle.dumps(select_user(user_account.id))
+            app.logger.info(usermail + '注册成功')
+            return json.dumps({'status': 200, 'message': '注册成功', 'args': 1}, ensure_ascii=False)
+    except Exception as e:
+        app.logger.error('error' + str(e))
+        return json.dumps({'status': 500, 'message': '系统错误', 'args': 0}, ensure_ascii=False)
 
 @app.route('/', methods=['GET'])
 def index():
@@ -109,11 +210,6 @@ def user_login():
                 session['account'] = account
                 # 根据user_id这个外键 查询user
                 query_result = select_user(user_account.id)
-                # 为空说明还没有个人信息，需要先在数据库创建一行记录
-                if query_result is None:
-                    # 执行一个更新操作
-                    add_user(user_account.id)
-                    query_result = select_user(user_account.id)
                 # 将user存到session里
                 session['user'] = pickle.dumps(query_result)
                 # print(session[str(user_account.id)])
@@ -141,6 +237,7 @@ def user_quit():
     try:
         account = session.get('account')
         session.pop('account')
+        session.pop('user')
         app.logger.info(str(account) + '退出了')
         return json.dumps({'status': 200, 'message': '退出成功', 'args': 1}, ensure_ascii=False)
     except Exception as e:
@@ -148,8 +245,8 @@ def user_quit():
         return json.dumps({'status': 500, 'message': '退出失败', 'args': 0}, ensure_ascii=False)
 
 
-@app.route('/logout', methods=['GET'])
-def logout():
+@app.route('/logoff', methods=['GET'])
+def logoff():
     """
     注销账户
     :return:
@@ -171,37 +268,7 @@ def logout():
         return json.dumps({'status': 200, 'message': '系统错误', 'args': 0}, ensure_ascii=False)
 
 
-@app.route('/mail', methods=['GET'])
-def to_user_send_mail():
-    """
-    注册,邮件发送验证码
-    :return:
-    """
-    try:
-        # 获取用户名
-        usermail = session.get('regist_account')
-        if usermail is None:
-            app.logger.info('缺失account参数')
-            return json.dumps({'status': 200, 'message': '参数错误', 'args': 0}, ensure_ascii=False)
-        # 获取验证码
-        code = ''
-        for i in range(0, 4):
-            code = code + str(random.randrange(0, 10))
-        # 邮件的标题
-        title = "注册激活"
-        # 邮件的内容
-        text = '<p>尊敬的' + usermail + '您的验证码为:' + code + '(有效期为5分钟)' + '</p>'
-        # 发送邮件
-        send_mail(mail, usermail, title, text)
-        # 二进制形式存储key value
-        redis_con.set(usermail + 'code', code)
-        # 过期时间5分钟
-        redis_con.expire(usermail + 'code', 300)
-        app.logger.info('邮件发送成功')
-        return json.dumps({'status': 200, 'message': '验证码发送成功', 'args': 1}, ensure_ascii=False)
-    except Exception as e:
-        app.logger.error('error:' + str(e))
-        return json.dumps({'status': 200, 'message': '验证码发送失败', 'args': 0}, ensure_ascii=False)
+
 
 
 @app.route('/reset_mail', methods=['GET'])
@@ -235,110 +302,6 @@ def to_user_send_reset_mail():
     except Exception as e:
         app.logger.error('error:' + str(e))
         return json.dumps({'status': 200, 'message': '验证码发送失败', 'args': 0}, ensure_ascii=False)
-
-
-@app.route('/regist', methods=['POST'])
-def user_register():
-    """
-    用户注册
-    :return:
-    """
-    try:
-        data_json = request.get_json()
-        # 获取用户名
-        usermail = session.get('regist_account')
-        # 获取密码
-        password = data_json.get('passwd')
-        # 获取昵称
-        name = data_json.get('name')
-        # 验证码
-        usercode = data_json.get('code')
-        if usermail is None or password is None or name is None or usercode is None:
-            return json.dumps({'status': 400, 'args': 0, 'message': '密码或账号不能为空', 'args': 0}, ensure_ascii=False)
-        if redis_con.get(usermail + 'code') is None:
-            app.logger.info(usermail + '验证码失效')
-            return json.dumps({'status': 200, 'message': '验证码已经过期', 'args': 0}, ensure_ascii=False)
-        else:
-            # 获取验证码
-            code = redis_con.get(usermail + 'code').decode('utf-8')
-            # 验证码校验不成功
-            if usercode != code:
-                app.logger.info(usermail + '验证码验证失败')
-                return json.dumps({'status': 200, 'message': '验证码输入错误', 'args': 0}, ensure_ascii=False)
-            salt = os.urandom(64)
-            hash_password = encryption(password, salt)
-            # 账号的存储
-            add_user_account(usermail, hash_password, salt)
-            # 用户名的添加
-            user_account = select_user_account(usermail)
-            # 生成uid
-            uid = ''
-            for i in range(0, 8):
-                uid = uid + str(random.randint(0, 9))
-            add_user(user_account.id, uid=int(uid), name=name)
-            # 用户个人信息存储到session里
-            session['user'] = pickle.dumps(select_user(user_account.id))
-            app.logger.info(usermail + '注册成功')
-            return json.dumps({'status': 200, 'message': '注册成功', 'args': 1}, ensure_ascii=False)
-    except Exception as e:
-        app.logger.error('error' + str(e))
-        return json.dumps({'status': 500, 'message': '系统错误', 'args': 0}, ensure_ascii=False)
-
-
-@app.route('/code_ver', methods=['POST'])
-def code_verification():
-    """
-    注册页面验证码的验证
-    :return:
-    """
-    try:
-        data_json = request.get_json()
-        # 获得用户名
-        usermail = data_json.get('account')
-        # 获得密码
-        usercode = data_json.get('code')
-        if usermail is None or usercode is None:
-            return json.dumps({'status': 400, 'args': 0}, ensure_ascii=False)
-        # 从redis中获取code
-        code = redis_con.get(usermail + 'code')
-        # 如果code为空
-        if code is None:
-            return json.dumps({'status': 200, 'message': '验证码已经过期', 'args': 0}, ensure_ascii=False)
-        else:
-            if code == usercode:
-                return json.dumps({'status': 200, 'message': '验证通过', 'args': 1}, ensure_ascii=False)
-            else:
-                return json.dumps({'status': 200, 'message': '验证码输入错误', 'args': 0}, ensure_ascii=False)
-    except Exception as e:
-        print(e)
-        return json.dumps({'status': 500, 'message': '系统错误'}, ensure_ascii=False)
-
-
-@app.route('/account_ver', methods=['POST'])
-def account_verification():
-    """
-    注册页面用户名唯一性的验证
-    :return:
-    """
-    try:
-        session.permanent = True
-        app.permanent_session_lifetime = timedelta(days=7)
-        data_json = request.get_json()
-        account = data_json.get('account')
-        if account is None:
-            return json.dumps({'status': 400, 'args': 0}, ensure_ascii=False)
-        user_account = select_user_account(account)
-        if user_account is None:
-            app.logger.info(account + '用户名可以使用')
-            session['regist_account'] = account
-            return json.dumps({'status': 200, 'message': '用户名可以使用', 'args': 1}, ensure_ascii=False)
-        else:
-            app.logger.info(account + '用户名不可以使用')
-            return json.dumps({'status': 200, 'message': '用户名重复', 'args': 0}, ensure_ascii=False)
-    except Exception as e:
-        app.logger.error('error' + str(e))
-        return json.dumps({'status': 500, 'message': '系统错误', 'args': 0}, ensure_ascii=False)
-
 
 @app.route('/reset', methods=['POST'])
 def reset_password():
@@ -489,7 +452,7 @@ def img_up():
         return json.dumps({'status': 500, 'message': '系统错误', 'args': 0}, ensure_ascii=False)
 
 
-@app.route('/user_img', methods=['GET', 'POST'])
+@app.route('/user_img', methods=['GET','POST'])
 def user_img():
     """
     获得用户的头像信息
@@ -502,16 +465,10 @@ def user_img():
         # 获取图片
         account = session.get('account')
         if account is None:
-            return json.dumps({'status': 401, 'args': 0}, ensure_ascii=False)
+            return json.dumps({'status': 401, 'args': 0,'message':'请先登录'}, ensure_ascii=False)
         user = pickle.loads(session.get('user'))
         if request.method == 'GET':
-            img = 'http://172.18.25.255:3333/uploads/deful.jpeg'
-            if user.img is not None:
-                img = 'http://172.18.25.255:3333/uploads/' + user.img
-            # img = ''
-            # for mode in mode_list:
-            #     if os.path.exists('uploads/' + account + mode):
-            #         img = 'uploads/' + account + mode
+            img = 'http://127.0.0.1:3333/uploads/' + user.img
             app.logger.info(account + '用户查询个人头像')
             return json.dumps(
                 {'status': 200, 'message': '查询成功', 'user': {'imageUrl': img}, 'args': 1},
@@ -843,20 +800,26 @@ def ziyouxing():
 @app.route('/wenda', methods=['GET'])
 def wenda():
     try:
+        hot_question, new_question, wait_question = wenda_parser()
+        return json.dumps({'status': 200, 'args': 1, 'hot_question': hot_question, 'new_question': new_question,
+                           'wait_question': wait_question}, ensure_ascii=False)
+    except Exception as e:
+        app.logger.info("error:" + str(e))
+        return json.dumps({'status': 500, 'message': '系统错误', 'args': 0}, ensure_ascii=False)
+
+
+@app.route('/wenda/detail')
+def wenda_detail():
+    try:
         id = request.values.get('id')
-        if id is None or id == '':
-            hot_question, new_question, wait_question = wenda_parser()
-            return json.dumps({'status': 200, 'args': 1, 'hot_question': hot_question, 'new_question': new_question,
-                               'wait_question': wait_question}, ensure_ascii=False)
-        else:
-            mdd, mdd_href, title, detail, tags, user, time, liulan_num, guanzhu_num, num, answer_list = wenda_detail_parser(
-                id)
-            return json.dumps(
-                {'status': 200, 'mdd': mdd, 'mdd_href': mdd_href, 'title': title, 'detail': detail, 'tags': tags,
-                 'user_name': user.get('user_name'), 'user_href': user.get('user_href'),
-                 'user_img': user.get('user_img'),
-                 'time': time, 'liulan_num': liulan_num, 'guanzhu_num': guanzhu_num, 'num': num,
-                 'answer_list': answer_list, 'args': 1}, ensure_ascii=False)
+        mdd, mdd_href, title, detail, tags, user, time, liulan_num, guanzhu_num, num, answer_list = wenda_detail_parser(
+            id)
+        return json.dumps(
+            {'status': 200, 'mdd': mdd, 'mdd_href': mdd_href, 'title': title, 'detail': detail, 'tags': tags,
+             'user_name': user.get('user_name'), 'user_href': user.get('user_href'),
+             'user_img': user.get('user_img'),
+             'time': time, 'liulan_num': liulan_num, 'guanzhu_num': guanzhu_num, 'num': num,
+             'answer_list': answer_list, 'args': 1}, ensure_ascii=False)
     except Exception as e:
         app.logger.info("error:" + str(e))
         return json.dumps({'status': 500, 'message': '系统错误', 'args': 0}, ensure_ascii=False)
@@ -879,13 +842,40 @@ def write_gonglve():
     try:
         data = request.get_json()
         content = data.get('content')
+        title = data.get('title')
         user = pickle.loads(session['user'])
-        add_write_gonglve(user.id, content)
+        add_write_gonglve(user.id, title,content)
         return json.dumps({'status': 200, 'args': 1}, ensure_ascii=False)
     except Exception as e:
         app.logger.info('error:' + str(e))
         return json.dumps({'status': 500, 'args': 0}, ensure_ascii=False)
 
-
+# @app.route('/code_ver', methods=['POST'])
+# def code_verification():
+#     """
+#     注册页面验证码的验证
+#     :return:
+#     """
+#     try:
+#         data_json = request.get_json()
+#         # 获得用户名
+#         usermail = data_json.get('account')
+#         # 获得密码
+#         usercode = data_json.get('code')
+#         if usermail is None or usercode is None:
+#             return json.dumps({'status': 400, 'args': 0}, ensure_ascii=False)
+#         # 从redis中获取code
+#         code = redis_con.get(usermail + 'code')
+#         # 如果code为空
+#         if code is None:
+#             return json.dumps({'status': 200, 'message': '验证码已经过期', 'args': 0}, ensure_ascii=False)
+#         else:
+#             if code == usercode:
+#                 return json.dumps({'status': 200, 'message': '验证通过', 'args': 1}, ensure_ascii=False)
+#             else:
+#                 return json.dumps({'status': 200, 'message': '验证码输入错误', 'args': 0}, ensure_ascii=False)
+#     except Exception as e:
+#         print(e)
+#         return json.dumps({'status': 500, 'message': '系统错误'}, ensure_ascii=False)
 if __name__ == '__main__':
     app.run()
