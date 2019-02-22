@@ -375,7 +375,7 @@ def get_head_show_image():
         for i in range(0, len(link)):
             date_ = date[i].split('/')
             head_img_info.append(
-                {'index': str(i + 1), 'href': link[i], 'src': src[i], 'txt3': h3[i], 'txt1': date_[0],
+                {'index': str(i + 1), 'href': 'https://www.mafengwo.cn'+link[i], 'src': src[i], 'txt3': h3[i], 'txt1': date_[0],
                  'txt2': date_[1]})
         data.append({'head_info': head_img_info})
         hot_place_a_list = selector.xpath('//div[@class="hot-place"]/a')
