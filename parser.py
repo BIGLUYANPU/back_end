@@ -846,8 +846,12 @@ def wenda_parser():
                 if li.xpath('div[@class="container"]/div[@class="identity"]/a/text()')[0] == '指路人':
                     guide = True
             img_url = ''
-            if len(li.xpath('div[@class="container"]/div[@class="desc clearfix"]/a/img/@src')) != 0:
+            if len(li.xpath('div[@class="container"]/div[@class="desc clearfix"]/a/img')) != 0:
                 img_url = li.xpath('div[@class="container"]/div[@class="desc clearfix"]/a/img/@src')[0]
+            elif len(li.xpath('div[@class="container"]/div[@class="desc clearfix"]/img')) != 0:
+                img_url = li.xpath('div[@class="container"]/div[@class="desc clearfix"]/img/@src')[0]
+            else:
+                img_url = ''
             abstract = '' if (len(li.xpath('div[@class="container"]/div[@class="desc clearfix"]/a/p/text()'))) == 0 else \
                 li.xpath('div[@class="container"]/div[@class="desc clearfix"]/a/p/text()')[0].strip()
             tags = []
@@ -904,8 +908,12 @@ def wenda_parser():
                 if li.xpath('div[@class="container"]/div[@class="identity"]/a/text()')[0] == '指路人':
                     guide = True
             img_url = ''
-            if len(li.xpath('div[@class="container"]/div[@class="desc clearfix"]/a/img/@src')) != 0:
+            if len(li.xpath('div[@class="container"]/div[@class="desc clearfix"]/a/img')) != 0:
                 img_url = li.xpath('div[@class="container"]/div[@class="desc clearfix"]/a/img/@src')[0]
+            elif len(li.xpath('div[@class="container"]/div[@class="desc clearfix"]/img'))!=0:
+                img_url = li.xpath('div[@class="container"]/div[@class="desc clearfix"]/img/@src')[0]
+            else:
+                img_url = ''
             abstract = ''
             if len(li.xpath('div[@class="container"]/div[@class="desc clearfix"]/p/text()')) != 0:
                 abstract = li.xpath('div[@class="container"]/div[@class="desc clearfix"]/p/text()')[0].strip()
@@ -958,8 +966,12 @@ def wenda_parser():
                 if li.xpath('div[@class="container"]/div[@class="identity"]/a/text()')[0] == '指路人':
                     guide = True
             img_url = ''
-            if len(li.xpath('div[@class="container"]/div[@class="desc clearfix"]/a/img/@src')) != 0:
+            if len(li.xpath('div[@class="container"]/div[@class="desc clearfix"]/a/img')) != 0:
                 img_url = li.xpath('div[@class="container"]/div[@class="desc clearfix"]/a/img/@src')[0]
+            elif len(li.xpath('div[@class="container"]/div[@class="desc clearfix"]/img')) != 0:
+                img_url = li.xpath('div[@class="container"]/div[@class="desc clearfix"]/img/@src')[0]
+            else:
+                img_url = ''
             abstract = ''
             if len(li.xpath('div[@class="container"]/div[@class="desc clearfix"]/p/text()')) != 0:
                 abstract = li.xpath('div[@class="container"]/div[@class="desc clearfix"]/p/text()')[0].strip()
