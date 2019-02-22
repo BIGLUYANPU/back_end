@@ -54,50 +54,72 @@ pymysql
 7.**主页相关**
 
 /home_new 方法get 主页中间最新游记模块的抓取
+
 /home 方法get 主页的头图和主页的热门游记抓取
 ## 用户相关接口一览表
 1.**注册前的邮箱验证**
+
 /account_ver 方法post 参数:account(邮箱)
+
 2.**注册发送邮件**
+
 /mail 方法get
+
 3.**注册**
+
 /regist 方法post 参数:passwd(密码) name(用户昵称) code(邮箱验证码)
+
 4.**用户登录检测**
+
 /login_success 方法get status:200 args:1 daka:True 用户登录且已经打卡
+
 5.**用户登录**
+
 /user_login  方法post 参数:account:邮箱账号 passwd:密码
+
 6.**用户退出**
+
 /quit 方法get status:200 args:1 用户退出成功
+
 7.**用户注销**
+
 /logoff  方法get status:200 args:1 用户注销成功
+
 8.**用户个人资料相关**
+
 /percentage 方法get 获得用户个人信息资料完善度
+
 /option 方法get和方法post
+
 &emsp;方法为get时:获取我的信息相关内容
+
 &emsp:方法为post时,用于
+
 /user_img 方法get和方法post
+
 &emsp;方法为get时:获取用户头像信息
+
 &emsp;方法为post时:用户上传头像
+
 /user_wallet 方法get 获取用户的蜂蜜数目
 # 2月20日更新日志
 ## 修改bug:
-/gong_lve /daka /home
+/gong_lve
+/daka
+/home
 ## 优化:
 db/db_class.py 可以实现全部删除表/创建表
 ## 新增:
 根目录下setting.py可以配置数据库的用户名和密码
-
 # 2月21日更新日志
 ## 修改bug:
-/mdd：
-season_recommend字段改成数组(key值改为数字)
-/gong_lve
-修复部分gonglve_url获取不到的问题
-/user_wallet
-打卡完成之后,user重新获取，解决bug
+/mdd：season_recommend字段改成数组(key值改为数字)
+
+/gong_lve 修复部分gonglve_url获取不到的问题
+
+/user_wallet 打卡完成之后,user重新获取，解决bug
 ## 新增
-/wenda
-增加wenda 获取hot_questions,new_questions,wait_questions
-/write_gonglve
-增加写攻略这个接口
+/wenda 增加wenda 获取hot_questions,new_questions,wait_questions
+
+/write_gonglve 增加写攻略这个接口
 
