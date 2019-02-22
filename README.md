@@ -37,7 +37,7 @@ pymysql
 
 /ziyouxing?id= 方法get 获取具体的自由行页面
 
-4.**攻略大类获取**
+4.**攻略大类页面获取(自由行 游记 问答)**
 
 /gong_lve 方法get 获取攻略推荐页面
 
@@ -91,17 +91,21 @@ pymysql
 
 /option 方法get和方法post
 
-&emsp;方法为get时:获取我的信息相关内容
+&emsp;&emsp;方法为get时:获取我的信息相关内容
 
-&emsp:方法为post时,用于
+&emsp;&emsp;方法为post时:
 
-/user_img 方法get和方法post
+&emsp;&emsp;&emsp;&emsp;1.用于我的信息页面 个人信息的更改
 
-&emsp;方法为get时:获取用户头像信息
+&emsp;&emsp;&emsp;&emsp;2.用于我的账号 密码的更改
 
-&emsp;方法为post时:用户上传头像
+/user_img 方法get 获取用户头像信息
+
+/user_img_up 方法post 参数:file用户上传头像
 
 /user_wallet 方法get 获取用户的蜂蜜数目
+
+/daka 方法get 用户打卡
 # 2月20日更新日志
 ## 修改bug:
 /gong_lve

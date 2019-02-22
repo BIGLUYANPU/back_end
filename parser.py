@@ -1001,59 +1001,75 @@ def wenda_detail_parser(id):
         req = requests.get(url=url, headers=headers)
         req.encoding = 'utf-8'
         selector = fromstring(req.text)
-        mdd = selector.xpath('//div[@class="q-content"]/div[@class="q-title"]/a[@class="location"]/text()')[0]
-        mdd_href = selector.xpath('//div[@class="q-content"]/div[@class="q-title"]/a[@class="location"]/@href')[0]
+        mdd = ''
+        mdd_href = ''
+        if len(selector.xpath('//div[@class="q-content"]/div[@class="q-title"]/a[@class="location"]'))!=0:
+            mdd = selector.xpath('//div[@class="q-content"]/div[@class="q-title"]/a[@class="location"]/text()')[0]
+            mdd_href = selector.xpath('//div[@class="q-content"]/div[@class="q-title"]/a[@class="location"]/@href')[0]
         title = selector.xpath('//div[@class="q-content"]/div[@class="q-title"]/h1/text()')[0].strip()
-        detail = selector.xpath('//div[@class="q-content"]/div[@class="q-desc"]/text()')[0]
+        detail = ''
+        if len(selector.xpath('//div[@class="q-content"]/div[@class="q-desc"]/text()'))!=0:
+            detail = selector.xpath('//div[@class="q-content"]/div[@class="q-desc"]/text()')[0]
         tags = []
-        tag = selector.xpath('//div[@class="q-tags fl"]/a')
-        tag_a_index = 1
-        for a in tag:
-            key = tag_a_index
-            href = a.xpath('@href')[0]
-            name = a.xpath('text()')[0]
-            tags.append({'key': key, 'name': name, 'href': href})
-            tag_a_index = tag_a_index + 1
-        user_href = selector.xpath('//div[@class="pub-bar fr"]/a[@class="photo"]/@href')[0]
-        user_img = selector.xpath('//div[@class="pub-bar fr"]/a[@class="photo"]/img/@src')[0]
-        user_name = selector.xpath('//div[@class="pub-bar fr"]/a[@class="name"]/text()')[0]
+        if len(selector.xpath('//div[@class="q-tags fl"]/a')) != 0:
+            tag = selector.xpath('//div[@class="q-tags fl"]/a')
+            tag_a_index = 1
+            for a in tag:
+                key = tag_a_index
+                href = a.xpath('@href')[0]
+                name = a.xpath('text()')[0]
+                tags.append({'key': key, 'name': name, 'href': href})
+                tag_a_index = tag_a_index + 1
+        user_img = ''
+        user_href = ''
+        user_name = ''
+        if len(selector.xpath('//div[@class="pub-bar fr"]/a[@class="photo"]')) !=0:
+            user_href = 'https://www.mafengwo.cn'+selector.xpath('//div[@class="pub-bar fr"]/a[@class="photo"]/@href')[0]
+            user_img = selector.xpath('//div[@class="pub-bar fr"]/a[@class="photo"]/img/@src')[0]
+            user_name = selector.xpath('//div[@class="pub-bar fr"]/a[@class="name"]/text()')[0]
+        if len(selector.xpath('//div[@class="pub-bar fr"]/span[@class="photo"]')) !=0:
+            user_name = '匿名用户'
+            user_img = selector.xpath('//div[@class="pub-bar fr"]/span[@class="photo"]/img/@src')[0]
+            user_href = ''
         user = {}
         user['user_href'] = user_href
         user['user_img'] = user_img
         user['user_name'] = user_name
-        time = selector.xpath('//div[@class="pub-bar fr"]/span/span/text()')[0]
+        time = selector.xpath('//div[@class="pub-bar fr"]/span[@class="time"]/span/text()')[0]
         liulan_num = selector.xpath('//div[@class="q-operate clearfix"]/div[@class="fr"]/span[1]/text()')[0]
         guanzhu_num = selector.xpath('//div[@class="q-operate clearfix"]/div[@class="fr"]/span[2]/span/text()')[0]
-        num = selector.xpath('//div[@class="answer-wrap"]/div[@class="hd"]/span/text()')[0]
+        num = ''
+        if len(selector.xpath('//div[@class="answer-wrap"]/div[@class="hd"]')) != 0:
+            num = selector.xpath('//div[@class="answer-wrap"]/div[@class="hd"]/span/text()')[0]
         answer_list = []
         answer_li_index = 1
         huida_li = selector.xpath('//div[@id="normal_answer_wrap"]/li')
-        for li in huida_li:
-            key = answer_li_index
+        if len(huida_li) != 0:
+            for li in huida_li:
+                key = answer_li_index
 
-            user_img = li.xpath(
-                'div[@class="answer-content _js_answer_content"]/div[@class="answer-info clearfix"]/div[@class="user-bar fl"]/a[@class="_j_filter_click avatar"]/img/@src')[
-                0]
-            user_name = li.xpath(
-                'div[@class="answer-content _js_answer_content"]/div[@class="answer-info clearfix"]/div[@class="user-bar fl"]/a[@class="name"]/text()')[
-                0]
-            user_level = li.xpath(
-                'div[@class="answer-content _js_answer_content"]/div[@class="answer-info clearfix"]/div[@class="user-bar fl"]/a[@class="level"]/text()')[
-                0]
-            user_href = li.xpath(
-                'div[@class="answer-content _js_answer_content"]/div[@class="answer-info clearfix"]/div[@class="user-bar fl"]/a[@class="name"]/@href')[
-                0]
-            guide = False if len(li.xpath(
-                'div[@class="answer-content _js_answer_content"]/div[@class="answer-info clearfix"]/div[@class="user-bar fl"]/a[@class="identity i-guide"]')) == 0 else True
-            gold = False if len(li.xpath(
-                'div[@class="answer-content _js_answer_content"]/div[@class="answer-info clearfix"]/ul[@class="answer-medal fr"]/li[@class="gold"]/div/a')) == 0 else True
-            answer = etree.tostring(li.xpath(
-                'div[@class="answer-content _js_answer_content"]/div[@class="_j_short_answer_item hide"]/div[@class="_j_answer_html"]')[
-                                        0], encoding='utf-8', method='html').decode('utf-8')
-            answer_list.append({'key': key, 'answer': answer, 'gold': gold, 'guide': guide, 'user_href': user_href,
-                                'user_level': user_level, 'user_img': user_img, 'user_name': user_name})
-            answer_li_index = answer_li_index + 1
-
+                user_img = li.xpath(
+                    'div[@class="answer-content _js_answer_content"]/div[@class="answer-info clearfix"]/div[@class="user-bar fl"]/a[@class="_j_filter_click avatar"]/img/@src')[
+                    0]
+                user_name = li.xpath(
+                    'div[@class="answer-content _js_answer_content"]/div[@class="answer-info clearfix"]/div[@class="user-bar fl"]/a[@class="name"]/text()')[
+                    0]
+                user_level = li.xpath(
+                    'div[@class="answer-content _js_answer_content"]/div[@class="answer-info clearfix"]/div[@class="user-bar fl"]/a[@class="level"]/text()')[
+                    0]
+                user_href = li.xpath(
+                    'div[@class="answer-content _js_answer_content"]/div[@class="answer-info clearfix"]/div[@class="user-bar fl"]/a[@class="name"]/@href')[
+                    0]
+                guide = False if len(li.xpath(
+                    'div[@class="answer-content _js_answer_content"]/div[@class="answer-info clearfix"]/div[@class="user-bar fl"]/a[@class="identity i-guide"]')) == 0 else True
+                gold = False if len(li.xpath(
+                    'div[@class="answer-content _js_answer_content"]/div[@class="answer-info clearfix"]/ul[@class="answer-medal fr"]/li[@class="gold"]/div/a')) == 0 else True
+                answer = etree.tostring(li.xpath(
+                    'div[@class="answer-content _js_answer_content"]/div[@class="_j_short_answer_item hide"]/div[@class="_j_answer_html"]')[
+                                            0], encoding='utf-8', method='html').decode('utf-8')
+                answer_list.append({'key': key, 'answer': answer, 'gold': gold, 'guide': guide, 'user_href': user_href,
+                                    'user_level': user_level, 'user_img': user_img, 'user_name': user_name})
+                answer_li_index = answer_li_index + 1
         return mdd, mdd_href, title, detail, tags, user, time, liulan_num, guanzhu_num, num, answer_list
     except Exception as e:
         print(e)

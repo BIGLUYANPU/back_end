@@ -5,7 +5,7 @@ import time
 
 
 # 查询user表
-def select_user(user_id):
+def select_user(user_id=None, id=None):
     """
     查询user
     :param user_id:
@@ -15,7 +15,11 @@ def select_user(user_id):
     session = get_con()
     try:
         # 创建Query查询，filter是where条件，最后调用one()返回唯一行，如果调用all()则返回所有行:
-        result = session.query(User).filter(User.user_id == user_id).all()
+        result = None
+        if user_id is not None:
+            result = session.query(User).filter(User.user_id == user_id).all()
+        if id is not None:
+            result = session.query(User).filter(User.id == id).all()
         if len(result) == 0:
             return None
         else:
@@ -25,26 +29,6 @@ def select_user(user_id):
     finally:
         session.close()
 
-# 查询user表
-def select_user_by_Id(id):
-    """
-    查询user
-    :param user_id:
-    :return:
-    """
-    # 创建Session:
-    session = get_con()
-    try:
-        # 创建Query查询，filter是where条件，最后调用one()返回唯一行，如果调用all()则返回所有行:
-        result = session.query(User).filter(User.id == id).all()
-        if len(result) == 0:
-            return None
-        else:
-            return result[0]
-    except Exception as e:
-        print(e)
-    finally:
-        session.close()
 
 # user增加数据
 def add_user(user_id, uid=0, name=None, sex=None, city=None, birthday=None, introduction=None, address=None, img=None,
@@ -83,7 +67,7 @@ def add_user(user_id, uid=0, name=None, sex=None, city=None, birthday=None, intr
 def user_cancel(user_id):
     session = get_con()
     try:
-        user = select_user(user_id)
+        user = select_user(user_id=user_id)
         session.delete(user)
         session.commit()
     except Exception as e:
@@ -101,7 +85,7 @@ def update_user(user_id, kwargs):
     """
     session = get_con()
     try:
-        user = select_user(user_id)
+        user = select_user(user_id=user_id)
         if kwargs.get('uid') is not None:
             user.uid = kwargs['uid']
         if kwargs.get('name') is not None:
@@ -223,7 +207,7 @@ def add_daka(user_id):
         # days默认为1
         days = 1
         # 如果用户不是第一次进行打卡
-        if len(select_daka(user_id)) !=0:
+        if len(select_daka(user_id)) != 0:
             # 查询最后一次的打卡记录 last_daka
             last_daka = select_daka(user_id)[-1]
             # 得到最后一次打卡时间
@@ -231,21 +215,21 @@ def add_daka(user_id):
             a = parse(update_time)
             b = parse(str(last_time))
             # 得到当前时间和最后一次打卡的差值
-            sub = (a-b).days
+            sub = (a - b).days
             # 连续打卡了
-            if sub <=1:
+            if sub <= 1:
                 # 连续打卡的天数加一
                 if last_daka.days is not None:
-                    days = last_daka.days+1
+                    days = last_daka.days + 1
         # 计算蜂蜜增加的数量
-        num = days%7 if days%7!=0 else 7
+        num = days % 7 if days % 7 != 0 else 7
         # 得到用户
-        user = select_user_by_Id(user_id)
+        user = select_user(id = user_id)
         # 增加的蜂蜜
-        honey = user.honey+num
-        add_user(user.user_id,honey=honey)
+        honey = user.honey + num
+        update_user(user.user_id, {'honey': honey})
         # 添加打卡记录
-        daka = DaKa(user_id=user_id,update_time=update_time,last_time=last_time,days=days)
+        daka = DaKa(user_id=user_id, update_time=update_time, last_time=last_time, days=days)
         session.add(daka)
         session.commit()
         return num
@@ -359,16 +343,18 @@ def add_gong_lve(nav_left, nav_right_img, content):
     finally:
         session.close()
 
-def add_write_gonglve(user_id,title,content):
+
+def add_write_gonglve(user_id, title, content):
     session = get_con()
     try:
-        write_gonglve = WriteGongLve(user_id = user_id,title=title,content = content)
+        write_gonglve = WriteGongLve(user_id=user_id, title=title, content=content)
         session.add(write_gonglve)
         session.commit()
     except Exception as e:
         print(e)
     finally:
         session.close()
+
 
 def select_write_gonglve(user_id):
     session = get_con()
@@ -380,8 +366,6 @@ def select_write_gonglve(user_id):
     finally:
         session.close()
 
+
 if __name__ == '__main__':
-    # a = parse('2018-10-10 12:02:11')
-    # b = parse('2018-10-10 12:02:11')
-    # print((a-b).days)
-    add_daka(1)
+    update_user(1, {'honey': 2})
