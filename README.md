@@ -126,4 +126,17 @@ db/db_class.py 可以实现全部删除表/创建表
 /wenda 增加wenda 获取hot_questions,new_questions,wait_questions
 
 /write_gonglve 增加写攻略这个接口
+# 2月22日更新日志
+## 修改bug：
+1.用户信息的修改sql 做更改
 
+2.问答 用户头像获取的bug修改
+
+3.用户默认头像 找不到的问题
+## 新增
+1.readme 写明目前用到的接口
+
+2.write_gonglve表 增加title
+
+## 优化
+1.对目前接口的重新做了次测试

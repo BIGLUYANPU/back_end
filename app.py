@@ -139,7 +139,7 @@ def user_register():
                 uid = uid + str(random.randint(0, 9))
             add_user(user_account.id, uid=int(uid), name=name,img='deful.jpeg')
             # 用户个人信息存储到session里
-            session['user'] = pickle.dumps(select_user(user_account.id))
+            session['user'] = pickle.dumps(select_user(user_id = user_account.id))
             app.logger.info(usermail + '注册成功')
             return json.dumps({'status': 200, 'message': '注册成功', 'args': 1}, ensure_ascii=False)
     except Exception as e:
@@ -209,7 +209,7 @@ def user_login():
                 # 将用户的账号存在session里面
                 session['account'] = account
                 # 根据user_id这个外键 查询user
-                query_result = select_user(user_account.id)
+                query_result = select_user(user_id = user_account.id)
                 # 将user存到session里
                 session['user'] = pickle.dumps(query_result)
                 # print(session[str(user_account.id)])
@@ -415,7 +415,7 @@ def option():
             # 修改用户的个人信息
             update_user(user_id, data_json)
             # 重新放到session里
-            session['user'] = pickle.dumps(select_user(user_id))
+            session['user'] = pickle.dumps(select_user(user_id = user_id))
             app.logger.info(account + '用户修改个人信息')
             return json.dumps({'status': 200, 'message': '修改成功', 'args': 1}, ensure_ascii=False)
     except Exception as e:
@@ -445,6 +445,7 @@ def img_up():
             return json.dumps({'status': 400, 'message': '图片支持jpg,jpeg,png', 'args': 0}, ensure_ascii=False)
         file.save('static/uploads/' + account + mode)
         update_user(user.user_id, {'img': account + mode})
+        session['user'] = pickle.dumps(select_user(id = user.id))
         app.logger.info(account + '用户头像上传成功')
         return json.dumps({'status': 200, 'message': '上传成功', 'args': 1}, ensure_ascii=False)
     except Exception as e:
@@ -452,7 +453,7 @@ def img_up():
         return json.dumps({'status': 500, 'message': '系统错误', 'args': 0}, ensure_ascii=False)
 
 
-@app.route('/user_img', methods=['GET','POST'])
+@app.route('/user_img', methods=['GET'])
 def user_img():
     """
     获得用户的头像信息
@@ -467,24 +468,11 @@ def user_img():
         if account is None:
             return json.dumps({'status': 401, 'args': 0,'message':'请先登录'}, ensure_ascii=False)
         user = pickle.loads(session.get('user'))
-        if request.method == 'GET':
-            img = 'http://127.0.0.1:3333/uploads/' + user.img
-            app.logger.info(account + '用户查询个人头像')
-            return json.dumps(
-                {'status': 200, 'message': '查询成功', 'user': {'imageUrl': img}, 'args': 1},
-                ensure_ascii=False)
-        else:
-            # 图片上传  参数的名字 file
-            file = request.files['file']
-            # 图片的格式
-            mode = '.' + secure_filename(file.filename).split('.')[1]
-            if mode not in mode_list:
-                app.logger.info(account + '用户上传头像失败，不支持' + mode + '格式')
-                return json.dumps({'status': 400, 'message': '图片支持jpg,jpeg,png', 'args': 0}, ensure_ascii=False)
-            file.save('static/uploads/' + account + mode)
-            update_user(user.user_id, {'img': account + mode})
-            app.logger.info(account + '用户头像上传成功')
-            return json.dumps({'status': 200, 'message': '上传成功', 'args': 1}, ensure_ascii=False)
+        img = 'http://127.0.0.1:3333/uploads/' + user.img
+        app.logger.info(account + '用户查询个人头像')
+        return json.dumps(
+            {'status': 200, 'message': '查询成功', 'user': {'imageUrl': img}, 'args': 1},
+            ensure_ascii=False)
     except Exception as e:
         app.logger.error('error' + str(e))
         return json.dumps({'status': 500, 'message': '系统错误', 'args': 0}, ensure_ascii=False)
@@ -545,7 +533,7 @@ def user_url():
         app.logger.info(account + '我的窝信息')
         return json.dumps(
             {'status': 200, 'message': '查询成功',
-             'user': {'wdo': 'http://172.18.27.151:8080/u/' + str(user.uid) + '.html'}, 'args': 1},
+             'user': {'wdo': 'http://127.0.0.1:8080/u/' + str(user.uid) + '.html'}, 'args': 1},
             ensure_ascii=False)
     except Exception as e:
         app.logger.error('error:' + str(e))
@@ -585,7 +573,7 @@ def daka():
         num = add_daka(user.id)
         app.logger.info(str(session.get('account')) + '打卡成功')
         # 蜂蜜值已经改变了 所以user需要重新获取
-        session['user'] = pickle.dumps(select_user_by_Id(user.id))
+        session['user'] = pickle.dumps(select_user(id = user.id))
         return json.dumps({'status': 200, 'message': '打卡成功', 'args': 1, 'num': num}, ensure_ascii=False)
     except Exception as e:
         app.logger.info(session.get('account') + '打卡失败' + 'error:' + str(e))
