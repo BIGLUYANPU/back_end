@@ -796,7 +796,7 @@ def wenda():
         return json.dumps({'status': 500, 'message': '系统错误', 'args': 0}, ensure_ascii=False)
 
 
-@app.route('/wenda/detail')
+@app.route('/wenda_detail')
 def wenda_detail():
     try:
         id = request.values.get('id')
