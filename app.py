@@ -168,14 +168,14 @@ def login_success():
     if len(daka_list) == 0:
         daka = False
     else:
-        update_time = select_daka(user.id)[-1].update_time
+        update_time = str(daka_list[-1].update_time).split(' ')[0]
         # 得到当前时间
-        time_now = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
+        time_now = time.strftime('%Y-%m-%d', time.localtime(time.time()))
         # 得到当前时间和用户最后一次打卡时间的差值
         days = (parse(time_now) - parse(str(update_time))).days
         # 默认为True 打卡
         # 如果天数不同，则没有打卡
-        if days != 0:
+        if days > 0:
             daka = False
     return json.dumps({'status': 200, 'message': '登录成功', 'daka': daka, 'args': 1}, ensure_ascii=False)
 

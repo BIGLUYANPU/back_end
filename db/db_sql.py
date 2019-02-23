@@ -212,12 +212,12 @@ def add_daka(user_id):
             last_daka = select_daka(user_id)[-1]
             # 得到最后一次打卡时间
             last_time = last_daka.update_time
-            a = parse(update_time)
-            b = parse(str(last_time))
+            a = parse(update_time.split(' ')[0])
+            b = parse(str(last_time).split(' ')[0])
             # 得到当前时间和最后一次打卡的差值
             sub = (a - b).days
             # 连续打卡了
-            if sub <= 1:
+            if sub == 1:
                 # 连续打卡的天数加一
                 if last_daka.days is not None:
                     days = last_daka.days + 1

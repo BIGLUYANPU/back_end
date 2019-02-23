@@ -320,7 +320,7 @@ def destination_parser():
             if len(title) == 0:
                 title = '更多'
             div_tiles_col_list.append({'src': src, 'title': title})
-        season_recommend.append({'key':1,'detail':div_tiles_col_list})
+        season_recommend.append({'key': 1, 'detail': div_tiles_col_list})
         div_tiles_col_list = []
         tiles_hide_count = 2
         tiles_hide = selector.xpath('//div[@class="tiles hide"]')
@@ -332,7 +332,7 @@ def destination_parser():
                 if len(title) == 0:
                     title = '更多'
                 div_tiles_col_list.append({'src': src, 'title': title})
-            season_recommend.append({'key':tiles_hide_count,'detail':div_tiles_col_list})
+            season_recommend.append({'key': tiles_hide_count, 'detail': div_tiles_col_list})
             div_tiles_col_list = []
             tiles_hide_count = tiles_hide_count + 1
         # 当季推荐解析完成
@@ -375,7 +375,8 @@ def get_head_show_image():
         for i in range(0, len(link)):
             date_ = date[i].split('/')
             head_img_info.append(
-                {'index': str(i + 1), 'href': 'https://www.mafengwo.cn'+link[i], 'src': src[i], 'txt3': h3[i], 'txt1': date_[0],
+                {'index': str(i + 1), 'href': 'https://www.mafengwo.cn' + link[i], 'src': src[i], 'txt3': h3[i],
+                 'txt1': date_[0],
                  'txt2': date_[1]})
         data.append({'head_info': head_img_info})
         hot_place_a_list = selector.xpath('//div[@class="hot-place"]/a')
@@ -910,7 +911,7 @@ def wenda_parser():
             img_url = ''
             if len(li.xpath('div[@class="container"]/div[@class="desc clearfix"]/a/img')) != 0:
                 img_url = li.xpath('div[@class="container"]/div[@class="desc clearfix"]/a/img/@src')[0]
-            elif len(li.xpath('div[@class="container"]/div[@class="desc clearfix"]/img'))!=0:
+            elif len(li.xpath('div[@class="container"]/div[@class="desc clearfix"]/img')) != 0:
                 img_url = li.xpath('div[@class="container"]/div[@class="desc clearfix"]/img/@src')[0]
             else:
                 img_url = ''
@@ -959,7 +960,8 @@ def wenda_parser():
                 user_href = ''
                 user_img = li.xpath('div[@class="container"]/div[@class="avatar nm"]/a/img/@src')[0]
             else:
-                user_href = 'https://www.mafengwo.cn' + li.xpath('div[@class="container"]/div[@class="avatar"]/a/@href')[0]
+                user_href = 'https://www.mafengwo.cn' + \
+                            li.xpath('div[@class="container"]/div[@class="avatar"]/a/@href')[0]
                 user_img = li.xpath('div[@class="container"]/div[@class="avatar"]/a/img/@src')[0]
             guide = False
             if len(li.xpath('div[@class="container"]/div[@class="identity"]/a/text()')) != 0:
@@ -1015,12 +1017,12 @@ def wenda_detail_parser(id):
         selector = fromstring(req.text)
         mdd = ''
         mdd_href = ''
-        if len(selector.xpath('//div[@class="q-content"]/div[@class="q-title"]/a[@class="location"]'))!=0:
+        if len(selector.xpath('//div[@class="q-content"]/div[@class="q-title"]/a[@class="location"]')) != 0:
             mdd = selector.xpath('//div[@class="q-content"]/div[@class="q-title"]/a[@class="location"]/text()')[0]
             mdd_href = selector.xpath('//div[@class="q-content"]/div[@class="q-title"]/a[@class="location"]/@href')[0]
         title = selector.xpath('//div[@class="q-content"]/div[@class="q-title"]/h1/text()')[0].strip()
         detail = ''
-        if len(selector.xpath('//div[@class="q-content"]/div[@class="q-desc"]/text()'))!=0:
+        if len(selector.xpath('//div[@class="q-content"]/div[@class="q-desc"]/text()')) != 0:
             detail = selector.xpath('//div[@class="q-content"]/div[@class="q-desc"]/text()')[0]
         tags = []
         if len(selector.xpath('//div[@class="q-tags fl"]/a')) != 0:
@@ -1035,11 +1037,12 @@ def wenda_detail_parser(id):
         user_img = ''
         user_href = ''
         user_name = ''
-        if len(selector.xpath('//div[@class="pub-bar fr"]/a[@class="photo"]')) !=0:
-            user_href = 'https://www.mafengwo.cn'+selector.xpath('//div[@class="pub-bar fr"]/a[@class="photo"]/@href')[0]
+        if len(selector.xpath('//div[@class="pub-bar fr"]/a[@class="photo"]')) != 0:
+            user_href = 'https://www.mafengwo.cn' + \
+                        selector.xpath('//div[@class="pub-bar fr"]/a[@class="photo"]/@href')[0]
             user_img = selector.xpath('//div[@class="pub-bar fr"]/a[@class="photo"]/img/@src')[0]
             user_name = selector.xpath('//div[@class="pub-bar fr"]/a[@class="name"]/text()')[0]
-        if len(selector.xpath('//div[@class="pub-bar fr"]/span[@class="photo"]')) !=0:
+        if len(selector.xpath('//div[@class="pub-bar fr"]/span[@class="photo"]')) != 0:
             user_name = '匿名用户'
             user_img = selector.xpath('//div[@class="pub-bar fr"]/span[@class="photo"]/img/@src')[0]
             user_href = ''
@@ -1076,9 +1079,13 @@ def wenda_detail_parser(id):
                     'div[@class="answer-content _js_answer_content"]/div[@class="answer-info clearfix"]/div[@class="user-bar fl"]/a[@class="identity i-guide"]')) == 0 else True
                 gold = False if len(li.xpath(
                     'div[@class="answer-content _js_answer_content"]/div[@class="answer-info clearfix"]/ul[@class="answer-medal fr"]/li[@class="gold"]/div/a')) == 0 else True
-                answer = etree.tostring(li.xpath(
+                answer = li.xpath(
                     'div[@class="answer-content _js_answer_content"]/div[@class="_j_short_answer_item hide"]/div[@class="_j_answer_html"]')[
-                                            0], encoding='utf-8', method='html').decode('utf-8')
+                    0]
+                for tag in answer:
+                    if len(tag.xpath('@src')) != 0:
+                        tag.attrib['src'] = tag.attrib['data-src']
+                answer = etree.tostring(answer, encoding='utf-8', method='html').decode('utf-8')
                 answer_list.append({'key': key, 'answer': answer, 'gold': gold, 'guide': guide, 'user_href': user_href,
                                     'user_level': user_level, 'user_img': user_img, 'user_name': user_name})
                 answer_li_index = answer_li_index + 1
