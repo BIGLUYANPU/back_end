@@ -183,7 +183,9 @@ def login_success():
         # 如果天数不同，则没有打卡
         if days > 0:
             daka = False
-    return json.dumps({'status': 200, 'message': '登录成功', 'daka': daka, 'args': 1}, ensure_ascii=False)
+    return json.dumps({'status': 200, 'message': '登录成功', 'daka': daka, 'args': 1,
+                       'user': {'src': 'http://127.0.0.1:3333/uploads/' + user.img, 'honey': user.honey,
+                                'money': user.money}}, ensure_ascii=False)
 
 
 @app.route('/user_login', methods=['POST'])
@@ -317,7 +319,7 @@ def reset_password():
         # 用户名
         account = session.get('account')
         if account is None:
-            return json.dumps({'status': 401, 'args': 0,'message':'请先登录'}, ensure_ascii=False)
+            return json.dumps({'status': 401, 'args': 0, 'message': '请先登录'}, ensure_ascii=False)
         data_json = request.get_json()
         salt = os.urandom(64)
         # 密码
@@ -437,7 +439,7 @@ def img_up():
         # 获取图片
         account = session.get('account')
         if account is None:
-            return json.dumps({'status': 401, 'args': 0,'message':'请登录'}, ensure_ascii=False)
+            return json.dumps({'status': 401, 'args': 0, 'message': '请登录'}, ensure_ascii=False)
         user = pickle.loads(session.get('user'))
         # 图片上传  参数的名字 file
         mode_list = ['.jpg', '.png', '.jpeg']
@@ -473,7 +475,7 @@ def user_img():
             return json.dumps({'status': 401, 'args': 0, 'message': '请先登录'}, ensure_ascii=False)
         user = pickle.loads(session.get('user'))
         img = 'http://127.0.0.1:3333/uploads/deful.jpeg'
-        if user.img !="" and user.img is not None:
+        if user.img != "" and user.img is not None:
             img = 'http://127.0.0.1:3333/uploads/' + user.img
         app.logger.info(account + '用户查询个人头像')
         return json.dumps(
@@ -534,7 +536,7 @@ def user_url():
     try:
         account = session.get('account')
         if account is None:
-            return json.dumps({'status': 401, 'args': 0,'message':'请登录'}, ensure_ascii=False)
+            return json.dumps({'status': 401, 'args': 0, 'message': '请登录'}, ensure_ascii=False)
         user = pickle.loads(session.get('user'))
         app.logger.info(account + '我的窝信息')
         return json.dumps(
@@ -555,7 +557,7 @@ def user_wallet():
     try:
         account = session.get('account')
         if account is None:
-            return json.dumps({'status': 401, 'args': 0,'message':'请登录'}, ensure_ascii=False)
+            return json.dumps({'status': 401, 'args': 0, 'message': '请登录'}, ensure_ascii=False)
         user = pickle.loads(session.get('user'))
         list = select_wallet_detail(user.id)
         detail = []
@@ -709,7 +711,7 @@ def youji_related():
         req = requests.get(url=url, headers=headers)
         html = json.loads(req.text)['data']['html']
         gonglve = []
-        if html !="":
+        if html != "":
             selector = fromstring(html)
             li_list_mdd = selector.xpath('//ul[@class="gs_content"]/li')
             li_index = 1
@@ -725,7 +727,7 @@ def youji_related():
         req = requests.get(url=url, headers=headers)
         html = json.loads(req.text)['data']['html']
         youji_list = []
-        if html !="":
+        if html != "":
             selector = fromstring(html)
             li_list_youji = selector.xpath('//ul[@class="gs_content"]/li')
             li_index = 1
