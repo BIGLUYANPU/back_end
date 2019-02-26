@@ -184,7 +184,7 @@ def login_success():
         if days > 0:
             daka = False
     return json.dumps({'status': 200, 'message': '登录成功', 'daka': daka, 'args': 1,
-                       'user': {'src': 'http://127.0.0.1:3333/uploads/' + user.img, 'honey': user.honey,
+                       'user': {'src': 'http://127.0.0.1:3333/uploads/' + user.img, 'coin': user.honey,
                                 'money': user.money}}, ensure_ascii=False)
 
 
