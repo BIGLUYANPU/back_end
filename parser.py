@@ -855,13 +855,13 @@ def wenda_new_parser():
             if len(li.xpath('div[@class="container"]/div[@class="identity"]/a/text()')) != 0:
                 if li.xpath('div[@class="container"]/div[@class="identity"]/a/text()')[0] == '指路人':
                     guide = True
-            img_url = ''
-            if len(li.xpath('div[@class="container"]/div[@class="desc clearfix"]/a/img')) != 0:
-                img_url = li.xpath('div[@class="container"]/div[@class="desc clearfix"]/a/img/@src')[0]
-            elif len(li.xpath('div[@class="container"]/div[@class="desc clearfix"]/img')) != 0:
-                img_url = li.xpath('div[@class="container"]/div[@class="desc clearfix"]/img/@src')[0]
-            else:
-                img_url = ''
+            # img_url = ''
+            # if len(li.xpath('div[@class="container"]/div[@class="desc clearfix"]/a/img')) != 0:
+            #     img_url = li.xpath('div[@class="container"]/div[@class="desc clearfix"]/a/img/@src')[0]
+            # elif len(li.xpath('div[@class="container"]/div[@class="desc clearfix"]/img')) != 0:
+            #     img_url = li.xpath('div[@class="container"]/div[@class="desc clearfix"]/img/@src')[0]
+            # else:
+            #     img_url = ''
             abstract = ''
             if len(li.xpath('div[@class="container"]/div[@class="desc clearfix"]/p/text()')) != 0:
                 abstract = li.xpath('div[@class="container"]/div[@class="desc clearfix"]/p/text()')[0].strip()
@@ -888,7 +888,7 @@ def wenda_new_parser():
             index = index + 1
             new_questions.append(
                 {'key': key, 'date': date, 'comment_num': comment_num, 'mdd': mdd, 'mdd_href': mdd_href,
-                 'zan_num': zan_num, 'tags': tags, 'abstract': abstract, 'img_url': img_url, 'guide': guide,
+                 'zan_num': zan_num, 'tags': tags, 'abstract': abstract, 'guide': guide,
                  'user_img': user_img, 'user_href': user_href, 'title': title, 'wenda_url': wenda_url})
         return new_questions
     except Exception as e:
@@ -930,13 +930,13 @@ def wenda_wait_parser():
             if len(li.xpath('div[@class="container"]/div[@class="identity"]/a/text()')) != 0:
                 if li.xpath('div[@class="container"]/div[@class="identity"]/a/text()')[0] == '指路人':
                     guide = True
-            img_url = ''
-            if len(li.xpath('div[@class="container"]/div[@class="desc clearfix"]/a/img')) != 0:
-                img_url = li.xpath('div[@class="container"]/div[@class="desc clearfix"]/a/img/@src')[0]
-            elif len(li.xpath('div[@class="container"]/div[@class="desc clearfix"]/img')) != 0:
-                img_url = li.xpath('div[@class="container"]/div[@class="desc clearfix"]/img/@src')[0]
-            else:
-                img_url = ''
+            # img_url = ''
+            # if len(li.xpath('div[@class="container"]/div[@class="desc clearfix"]/a/img')) != 0:
+            #     img_url = li.xpath('div[@class="container"]/div[@class="desc clearfix"]/a/img/@src')[0]
+            # elif len(li.xpath('div[@class="container"]/div[@class="desc clearfix"]/img')) != 0:
+            #     img_url = li.xpath('div[@class="container"]/div[@class="desc clearfix"]/img/@src')[0]
+            # else:
+            #     img_url = ''
             abstract = ''
             if len(li.xpath('div[@class="container"]/div[@class="desc clearfix"]/p/text()')) != 0:
                 abstract = li.xpath('div[@class="container"]/div[@class="desc clearfix"]/p/text()')[0].strip()
@@ -957,7 +957,7 @@ def wenda_wait_parser():
             index = index + 1
             wait_questions.append(
                 {'key': key, 'date': date, 'comment_num': '', 'mdd': mdd, 'mdd_href': mdd_href,
-                 'zan_num': zan_num, 'tags': tags, 'abstract': abstract, 'img_url': img_url, 'guide': guide,
+                 'zan_num': zan_num, 'tags': tags, 'abstract': abstract,'guide': guide,
                  'user_img': user_img, 'user_href': user_href, 'title': title, 'wenda_url': wenda_url})
         return wait_questions
     except Exception as e:
