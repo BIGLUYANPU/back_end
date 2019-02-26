@@ -44,6 +44,12 @@ app.config['SECRET_KEY'] = os.urandom(6)
 # 解决跨域和cookie
 CORS(app, supports_credentials=True)
 
+
+@app.route('/', methods=['GET'])
+def index():
+    return render_template('index.html')
+
+
 @app.route('/account_ver', methods=['POST'])
 def account_verification():
     """
@@ -68,6 +74,8 @@ def account_verification():
     except Exception as e:
         app.logger.error('error' + str(e))
         return json.dumps({'status': 500, 'message': '系统错误', 'args': 0}, ensure_ascii=False)
+
+
 @app.route('/mail', methods=['GET'])
 def to_user_send_mail():
     """
@@ -99,6 +107,8 @@ def to_user_send_mail():
     except Exception as e:
         app.logger.error('error:' + str(e))
         return json.dumps({'status': 200, 'message': '验证码发送失败', 'args': 0}, ensure_ascii=False)
+
+
 @app.route('/regist', methods=['POST'])
 def user_register():
     """
@@ -116,7 +126,7 @@ def user_register():
         # 验证码
         usercode = data_json.get('code')
         if usermail is None or password is None or name is None or usercode is None:
-            return json.dumps({'status': 400, 'args': 0, 'message': '密码或账号不能为空',}, ensure_ascii=False)
+            return json.dumps({'status': 400, 'args': 0, 'message': '密码或账号不能为空', }, ensure_ascii=False)
         if redis_con.get(usermail + 'code') is None:
             app.logger.info(usermail + '验证码失效')
             return json.dumps({'status': 200, 'message': '验证码已经过期', 'args': 0}, ensure_ascii=False)
@@ -137,18 +147,14 @@ def user_register():
             uid = ''
             for i in range(0, 8):
                 uid = uid + str(random.randint(0, 9))
-            add_user(user_account.id, uid=int(uid), name=name,img='deful.jpeg')
+            add_user(user_account.id, uid=int(uid), name=name, img='deful.jpeg')
             # 用户个人信息存储到session里
-            session['user'] = pickle.dumps(select_user(user_id = user_account.id))
+            session['user'] = pickle.dumps(select_user(user_id=user_account.id))
             app.logger.info(usermail + '注册成功')
             return json.dumps({'status': 200, 'message': '注册成功', 'args': 1}, ensure_ascii=False)
     except Exception as e:
         app.logger.error('error' + str(e))
         return json.dumps({'status': 500, 'message': '系统错误', 'args': 0}, ensure_ascii=False)
-
-@app.route('/', methods=['GET'])
-def index():
-    return render_template('index.html')
 
 
 @app.route('/login_success', methods=['GET'])
@@ -209,7 +215,7 @@ def user_login():
                 # 将用户的账号存在session里面
                 session['account'] = account
                 # 根据user_id这个外键 查询user
-                query_result = select_user(user_id = user_account.id)
+                query_result = select_user(user_id=user_account.id)
                 # 将user存到session里
                 session['user'] = pickle.dumps(query_result)
                 # print(session[str(user_account.id)])
@@ -268,9 +274,6 @@ def logoff():
         return json.dumps({'status': 200, 'message': '系统错误', 'args': 0}, ensure_ascii=False)
 
 
-
-
-
 @app.route('/reset_mail', methods=['GET'])
 def to_user_send_reset_mail():
     """
@@ -302,6 +305,7 @@ def to_user_send_reset_mail():
     except Exception as e:
         app.logger.error('error:' + str(e))
         return json.dumps({'status': 200, 'message': '验证码发送失败', 'args': 0}, ensure_ascii=False)
+
 
 @app.route('/reset', methods=['POST'])
 def reset_password():
@@ -415,7 +419,7 @@ def option():
             # 修改用户的个人信息
             update_user(user_id, data_json)
             # 重新放到session里
-            session['user'] = pickle.dumps(select_user(user_id = user_id))
+            session['user'] = pickle.dumps(select_user(user_id=user_id))
             app.logger.info(account + '用户修改个人信息')
             return json.dumps({'status': 200, 'message': '修改成功', 'args': 1}, ensure_ascii=False)
     except Exception as e:
@@ -445,7 +449,7 @@ def img_up():
             return json.dumps({'status': 400, 'message': '图片支持jpg,jpeg,png', 'args': 0}, ensure_ascii=False)
         file.save('static/uploads/' + account + mode)
         update_user(user.user_id, {'img': account + mode})
-        session['user'] = pickle.dumps(select_user(id = user.id))
+        session['user'] = pickle.dumps(select_user(id=user.id))
         app.logger.info(account + '用户头像上传成功')
         return json.dumps({'status': 200, 'message': '上传成功', 'args': 1}, ensure_ascii=False)
     except Exception as e:
@@ -466,7 +470,7 @@ def user_img():
         # 获取图片
         account = session.get('account')
         if account is None:
-            return json.dumps({'status': 401, 'args': 0,'message':'请先登录'}, ensure_ascii=False)
+            return json.dumps({'status': 401, 'args': 0, 'message': '请先登录'}, ensure_ascii=False)
         user = pickle.loads(session.get('user'))
         img = 'http://127.0.0.1:3333/uploads/' + user.img
         app.logger.info(account + '用户查询个人头像')
@@ -555,11 +559,13 @@ def user_wallet():
         detail = []
         detail_index = 1
         for wallet_detail in list:
-            detail.append({'key':detail_index,'time':str(wallet_detail.update_time),'num':wallet_detail.add_num,'detail':wallet_detail.detail})
+            detail.append({'key': detail_index, 'time': str(wallet_detail.update_time), 'num': wallet_detail.add_num,
+                           'detail': wallet_detail.detail})
             detail_index = detail_index + 1
         app.logger.info(account + '用户的钱包信息')
         return json.dumps(
-            {'status': 200, 'message': '查询成功', 'user': {'money': user.money, 'honey': user.honey, 'args': 1,'detail':detail},
+            {'status': 200, 'message': '查询成功',
+             'user': {'money': user.money, 'honey': user.honey, 'args': 1, 'detail': detail},
              'args': 1},
             ensure_ascii=False)
     except Exception as e:
@@ -576,10 +582,10 @@ def daka():
     try:
         user = pickle.loads(session.get('user'))
         num = add_daka(user.id)
-        add_wallet_detail(user.id,num,'打卡')
+        add_wallet_detail(user.id, num, '打卡')
         app.logger.info(str(session.get('account')) + '打卡成功')
         # 蜂蜜值已经改变了 所以user需要重新获取
-        session['user'] = pickle.dumps(select_user(id = user.id))
+        session['user'] = pickle.dumps(select_user(id=user.id))
         return json.dumps({'status': 200, 'message': '打卡成功', 'args': 1, 'num': num}, ensure_ascii=False)
     except Exception as e:
         app.logger.info(session.get('account') + '打卡失败' + 'error:' + str(e))
@@ -791,12 +797,31 @@ def ziyouxing():
         return json.dumps({'status': 500, 'message': '系统错误', 'args': 0})
 
 
-@app.route('/wenda', methods=['GET'])
-def wenda():
+@app.route('/wenda/hot', methods=['GET'])
+def wenda_hot():
     try:
-        hot_question, new_question, wait_question = wenda_parser()
-        return json.dumps({'status': 200, 'args': 1, 'hot_question': hot_question, 'new_question': new_question,
-                           'wait_question': wait_question}, ensure_ascii=False)
+        hot_question = wenda_hot_parser()
+        return json.dumps({'status': 200, 'args': 1, 'hot_question': hot_question}, ensure_ascii=False)
+    except Exception as e:
+        app.logger.info("error:" + str(e))
+        return json.dumps({'status': 500, 'message': '系统错误', 'args': 0}, ensure_ascii=False)
+
+
+@app.route('/wenda/new', methods=['GET'])
+def wenda_new():
+    try:
+        new_question = wenda_new_parser()
+        return json.dumps({'status': 200, 'args': 1, 'new_question': new_question}, ensure_ascii=False)
+    except Exception as e:
+        app.logger.info("error:" + str(e))
+        return json.dumps({'status': 500, 'message': '系统错误', 'args': 0}, ensure_ascii=False)
+
+
+@app.route('/wenda/wait', methods=['GET'])
+def wenda_wait():
+    try:
+        wait_question = wenda_wait_parser()
+        return json.dumps({'status': 200, 'args': 1, 'wait_question': wait_question}, ensure_ascii=False)
     except Exception as e:
         app.logger.info("error:" + str(e))
         return json.dumps({'status': 500, 'message': '系统错误', 'args': 0}, ensure_ascii=False)
@@ -838,11 +863,12 @@ def write_gonglve():
         content = data.get('content')
         title = data.get('title')
         user = pickle.loads(session['user'])
-        add_write_gonglve(user.id, title,content)
+        add_write_gonglve(user.id, title, content)
         return json.dumps({'status': 200, 'args': 1}, ensure_ascii=False)
     except Exception as e:
         app.logger.info('error:' + str(e))
         return json.dumps({'status': 500, 'args': 0}, ensure_ascii=False)
+
 
 # @app.route('/code_ver', methods=['POST'])
 # def code_verification():

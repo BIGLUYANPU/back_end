@@ -810,17 +810,12 @@ def ziyouxing_parser(id):
         print(e)
 
 
-def wenda_parser():
+def wenda_new_parser():
+    # 新问题
     try:
-        # 热门问题
-        hot_questions = []
-        # 最新问题
         new_questions = []
-        # 待回答问题
-        wait_questions = []
-        # 热门问题
-        url = 'https://www.mafengwo.cn/qa/ajax_qa/more?type=1&mddid=&tid=&sort=10&key=&page=0&time='
-        headers = headers = {
+        url = 'https://www.mafengwo.cn/qa/ajax_qa/more?type=0&mddid=&tid=&sort=1&key=&page=0&time='
+        headers = {
             'Host': 'www.mafengwo.cn',
             'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36',
             'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
@@ -829,54 +824,6 @@ def wenda_parser():
             'Upgrade - Insecure - Requests': '1',
             'x-requested-with': 'XMLHttpRequest'
         }
-        req = requests.get(url=url, headers=headers)
-        html = json.loads(req.text)['data']['html']
-        selector = fromstring(html)
-        li_list = selector.xpath('//li[@class="item clearfix "]')
-        # 得到每个li标签
-        index = 1
-        for li in li_list:
-            key = int('1' + str(index))
-            wenda_url = 'https://www.mafengwo.cn' + li.xpath('div[@class="title"]/a/@href')[0]
-            title = li.xpath('div[@class="title"]/a/text()')[0]
-            user_href = 'https://www.mafengwo.cn' + \
-                        li.xpath('div[@class="container"]/div[@class="avatar"]/a/@href')[0]
-            user_img = li.xpath('div[@class="container"]/div[@class="avatar"]/a/img/@src')[0]
-            guide = False
-            if len(li.xpath('div[@class="container"]/div[@class="identity"]/a/text()')) != 0:
-                if li.xpath('div[@class="container"]/div[@class="identity"]/a/text()')[0] == '指路人':
-                    guide = True
-            img_url = ''
-            if len(li.xpath('div[@class="container"]/div[@class="desc clearfix"]/a/img')) != 0:
-                img_url = li.xpath('div[@class="container"]/div[@class="desc clearfix"]/a/img/@src')[0]
-            elif len(li.xpath('div[@class="container"]/div[@class="desc clearfix"]/img')) != 0:
-                img_url = li.xpath('div[@class="container"]/div[@class="desc clearfix"]/img/@src')[0]
-            else:
-                img_url = ''
-            abstract = '' if (len(li.xpath('div[@class="container"]/div[@class="desc clearfix"]/a/p/text()'))) == 0 else \
-                li.xpath('div[@class="container"]/div[@class="desc clearfix"]/a/p/text()')[0].strip()
-            tags = []
-            if len(li.xpath('div[@class="container"]/div[@class="tags"]')) != 0:
-                tag_a_list = li.xpath('div[@class="container"]/div[@class="tags"]/a')
-                for a in tag_a_list:
-                    tag_href = 'https://www.mafengwo.cn' + a.xpath('@href')[0]
-                    tag_title = a.xpath('text()')[0]
-                    tags.append({'href': tag_href, 'title': tag_title})
-            else:
-                tags.append({'href': '', 'title': ''})
-            zan_num = li.xpath('div[@class="container"]/div[@class="operate"]/div[@class="zan"]/text()')[0]
-            mdd_href = 'https://www.mafengwo.cn' + \
-                       li.xpath('div[@class="container"]/div[@class="operate"]/div[@class="mdd"]/a/@href')[0]
-            mdd = li.xpath('div[@class="container"]/div[@class="operate"]/div[@class="mdd"]/a/text()')[0]
-            comment_num = li.xpath('div[@class="container"]/div[@class="operate"]/a/span[@class="reply"]/text()')[0]
-            date = li.xpath('div[@class="container"]/div[@class="operate"]/span[@class="date"]/text()')[0]
-            index = index + 1
-            hot_questions.append(
-                {'key': key, 'date': date, 'comment_num': comment_num, 'mdd': mdd, 'mdd_href': mdd_href,
-                 'zan_num': zan_num, 'tags': tags, 'abstract': abstract, 'img_url': img_url, 'guide': guide,
-                 'user_img': user_img, 'user_href': user_href, 'title': title, 'wenda_url': wenda_url})
-        # 新问题
-        url = 'https://www.mafengwo.cn/qa/ajax_qa/more?type=0&mddid=&tid=&sort=1&key=&page=0&time='
         req = requests.get(url=url, headers=headers)
         html = json.loads(req.text)['data']['html']
         selector = fromstring(html)
@@ -943,9 +890,25 @@ def wenda_parser():
                 {'key': key, 'date': date, 'comment_num': comment_num, 'mdd': mdd, 'mdd_href': mdd_href,
                  'zan_num': zan_num, 'tags': tags, 'abstract': abstract, 'img_url': img_url, 'guide': guide,
                  'user_img': user_img, 'user_href': user_href, 'title': title, 'wenda_url': wenda_url})
+        return new_questions
+    except Exception as e:
+        print(e)
+
+def wenda_wait_parser():
+    try:
         # 待回答问题
+        wait_questions = []
         index = 1
         url = 'https://www.mafengwo.cn/qa/ajax_qa/more?type=2&mddid=&tid=&sort=1&key=&page=0&time='
+        headers = {
+            'Host': 'www.mafengwo.cn',
+            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36',
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
+            'Cache-Control': 'no-cache',
+            'pragma': 'no-cache',
+            'Upgrade - Insecure - Requests': '1',
+            'x-requested-with': 'XMLHttpRequest'
+        }
         req = requests.get(url=url, headers=headers)
         html = json.loads(req.text)['data']['html']
         selector = fromstring(html)
@@ -996,7 +959,78 @@ def wenda_parser():
                 {'key': key, 'date': date, 'comment_num': '', 'mdd': mdd, 'mdd_href': mdd_href,
                  'zan_num': zan_num, 'tags': tags, 'abstract': abstract, 'img_url': img_url, 'guide': guide,
                  'user_img': user_img, 'user_href': user_href, 'title': title, 'wenda_url': wenda_url})
-        return hot_questions, new_questions, wait_questions
+        return wait_questions
+    except Exception as e:
+        print(e)
+
+
+def wenda_hot_parser():
+    try:
+        # 热门问题
+        hot_questions = []
+        # 最新问题
+        new_questions = []
+        # 待回答问题
+        wait_questions = []
+        # 热门问题
+        url = 'https://www.mafengwo.cn/qa/ajax_qa/more?type=1&mddid=&tid=&sort=10&key=&page=0&time='
+        headers = {
+            'Host': 'www.mafengwo.cn',
+            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36',
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
+            'Cache-Control': 'no-cache',
+            'pragma': 'no-cache',
+            'Upgrade - Insecure - Requests': '1',
+            'x-requested-with': 'XMLHttpRequest'
+        }
+        req = requests.get(url=url, headers=headers)
+        html = json.loads(req.text)['data']['html']
+        selector = fromstring(html)
+        li_list = selector.xpath('//li[@class="item clearfix "]')
+        # 得到每个li标签
+        index = 1
+        for li in li_list:
+            key = int('1' + str(index))
+            wenda_url = 'https://www.mafengwo.cn' + li.xpath('div[@class="title"]/a/@href')[0]
+            title = li.xpath('div[@class="title"]/a/text()')[0]
+            user_href = 'https://www.mafengwo.cn' + \
+                        li.xpath('div[@class="container"]/div[@class="avatar"]/a/@href')[0]
+            user_img = li.xpath('div[@class="container"]/div[@class="avatar"]/a/img/@src')[0]
+            guide = False
+            if len(li.xpath('div[@class="container"]/div[@class="identity"]/a/text()')) != 0:
+                if li.xpath('div[@class="container"]/div[@class="identity"]/a/text()')[0] == '指路人':
+                    guide = True
+            img_url = ''
+            if len(li.xpath('div[@class="container"]/div[@class="desc clearfix"]/a/img')) != 0:
+                img_url = li.xpath('div[@class="container"]/div[@class="desc clearfix"]/a/img/@src')[0]
+            elif len(li.xpath('div[@class="container"]/div[@class="desc clearfix"]/img')) != 0:
+                img_url = li.xpath('div[@class="container"]/div[@class="desc clearfix"]/img/@src')[0]
+            else:
+                img_url = ''
+            abstract = '' if (len(li.xpath('div[@class="container"]/div[@class="desc clearfix"]/a/p/text()'))) == 0 else \
+                li.xpath('div[@class="container"]/div[@class="desc clearfix"]/a/p/text()')[0].strip()
+            tags = []
+            if len(li.xpath('div[@class="container"]/div[@class="tags"]')) != 0:
+                tag_a_list = li.xpath('div[@class="container"]/div[@class="tags"]/a')
+                for a in tag_a_list:
+                    tag_href = 'https://www.mafengwo.cn' + a.xpath('@href')[0]
+                    tag_title = a.xpath('text()')[0]
+                    tags.append({'href': tag_href, 'title': tag_title})
+            else:
+                tags.append({'href': '', 'title': ''})
+            zan_num = li.xpath('div[@class="container"]/div[@class="operate"]/div[@class="zan"]/text()')[0]
+            mdd_href = 'https://www.mafengwo.cn' + \
+                       li.xpath('div[@class="container"]/div[@class="operate"]/div[@class="mdd"]/a/@href')[0]
+            mdd = li.xpath('div[@class="container"]/div[@class="operate"]/div[@class="mdd"]/a/text()')[0]
+            comment_num = li.xpath('div[@class="container"]/div[@class="operate"]/a/span[@class="reply"]/text()')[0]
+            date = li.xpath('div[@class="container"]/div[@class="operate"]/span[@class="date"]/text()')[0]
+            index = index + 1
+            hot_questions.append(
+                {'key': key, 'date': date, 'comment_num': comment_num, 'mdd': mdd, 'mdd_href': mdd_href,
+                 'zan_num': zan_num, 'tags': tags, 'abstract': abstract, 'img_url': img_url, 'guide': guide,
+                 'user_img': user_img, 'user_href': user_href, 'title': title, 'wenda_url': wenda_url})
+
+        return hot_questions
     except Exception as e:
         print(e)
 
