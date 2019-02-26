@@ -1156,30 +1156,32 @@ def wenda_related_parser(id):
         }
         req = requests.get(url=url, headers=headers)
         data = json.loads(req.text)['data']['html']
-        html = fromstring(data)
         activity = []
-        ul = html.xpath('//ul[@class="slide-img"]/li')
-        activity_index = 1
-        for li in ul:
-            href = li.xpath('a/@href')[0]
-            src = li.xpath('a/img/@src')[0]
-            key = int('1' + str(activity_index))
-            activity_index = activity_index + 1
-            activity.append({'key': key, 'href': href, 'src': src})
+        if data !="":
+            html = fromstring(data)
+            ul = html.xpath('//ul[@class="slide-img"]/li')
+            activity_index = 1
+            for li in ul:
+                href = li.xpath('a/@href')[0]
+                src = li.xpath('a/img/@src')[0]
+                key = int('1' + str(activity_index))
+                activity_index = activity_index + 1
+                activity.append({'key': key, 'href': href, 'src': src})
         url = 'https://pagelet.mafengwo.cn/qa/pagelet/RelationQuestionApi?params={"qid":' + id + '}'
         req = requests.get(url=url, headers=headers)
         data = json.loads(req.text)['data']['html']
-        html = fromstring(data)
         related_questions = []
-        ul = html.xpath('//ul[@class="bd"]/li')
-        related_index = 1
-        for li in ul:
-            title = li.xpath('a/text()')[0].strip()
-            href = li.xpath('a/@href')[0]
-            answer = li.xpath('span/text()')[0]
-            key = int('2' + str(related_index))
-            related_index = related_index + 1
-            related_questions.append({'key': key, 'href': href, 'answer': answer, 'title': title})
+        if data !="":
+            html = fromstring(data)
+            ul = html.xpath('//ul[@class="bd"]/li')
+            related_index = 1
+            for li in ul:
+                title = li.xpath('a/text()')[0].strip()
+                href = li.xpath('a/@href')[0]
+                answer = li.xpath('span/text()')[0]
+                key = int('2' + str(related_index))
+                related_index = related_index + 1
+                related_questions.append({'key': key, 'href': href, 'answer': answer, 'title': title})
         return activity, related_questions
     except Exception as  e:
         print(e)
