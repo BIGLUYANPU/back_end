@@ -317,7 +317,7 @@ def reset_password():
         # 用户名
         account = session.get('account')
         if account is None:
-            return json.dumps({'status': 401, 'args': 0}, ensure_ascii=False)
+            return json.dumps({'status': 401, 'args': 0,'message':'请先登录'}, ensure_ascii=False)
         data_json = request.get_json()
         salt = os.urandom(64)
         # 密码
@@ -375,7 +375,7 @@ def option():
     try:
         account = session.get('account')
         if account is None:
-            return json.dumps({'status': 401, 'message': '重新登录', 'args': 0}, ensure_ascii=False)
+            return json.dumps({'status': 401, 'message': '请登录', 'args': 0}, ensure_ascii=False)
         # 如果是get方法
         if request.method == 'GET':
             user = pickle.loads(session.get('user'))
@@ -437,7 +437,7 @@ def img_up():
         # 获取图片
         account = session.get('account')
         if account is None:
-            return json.dumps({'status': 401, 'args': 0}, ensure_ascii=False)
+            return json.dumps({'status': 401, 'args': 0,'message':'请登录'}, ensure_ascii=False)
         user = pickle.loads(session.get('user'))
         # 图片上传  参数的名字 file
         mode_list = ['.jpg', '.png', '.jpeg']
@@ -472,7 +472,9 @@ def user_img():
         if account is None:
             return json.dumps({'status': 401, 'args': 0, 'message': '请先登录'}, ensure_ascii=False)
         user = pickle.loads(session.get('user'))
-        img = 'http://127.0.0.1:3333/uploads/' + user.img
+        img = 'http://127.0.0.1:3333/uploads/deful.jpeg'
+        if user.img !="" and user.img is not None:
+            img = 'http://127.0.0.1:3333/uploads/' + user.img
         app.logger.info(account + '用户查询个人头像')
         return json.dumps(
             {'status': 200, 'message': '查询成功', 'user': {'imageUrl': img}, 'args': 1},
@@ -492,7 +494,7 @@ def user_bind():
     try:
         account = session.get('account')
         if account is None:
-            return json.dumps({'status': 401, 'message': '重新登录', 'args': 0}, ensure_ascii=False)
+            return json.dumps({'status': 401, 'message': '请登录', 'args': 0}, ensure_ascii=False)
         user = pickle.loads(session.get('user'))
         app.logger.info(account + '查询用户的绑定信息')
         return json.dumps(
@@ -512,7 +514,7 @@ def user_safe():
     try:
         account = session.get('account')
         if account is None:
-            return json.dumps({'status': 401, 'message': '重新登录', 'args': 0}, ensure_ascii=False)
+            return json.dumps({'status': 401, 'message': '请登录', 'args': 0}, ensure_ascii=False)
         user = pickle.loads(session.get('user'))
         app.logger.info(account + '查询用户的安全信息')
         return json.dumps(
@@ -532,7 +534,7 @@ def user_url():
     try:
         account = session.get('account')
         if account is None:
-            return json.dumps({'status': 401, 'args': 0}, ensure_ascii=False)
+            return json.dumps({'status': 401, 'args': 0,'message':'请登录'}, ensure_ascii=False)
         user = pickle.loads(session.get('user'))
         app.logger.info(account + '我的窝信息')
         return json.dumps(
@@ -553,7 +555,7 @@ def user_wallet():
     try:
         account = session.get('account')
         if account is None:
-            return json.dumps({'status': 401, 'args': 0}, ensure_ascii=False)
+            return json.dumps({'status': 401, 'args': 0,'message':'请登录'}, ensure_ascii=False)
         user = pickle.loads(session.get('user'))
         list = select_wallet_detail(user.id)
         detail = []
@@ -706,34 +708,35 @@ def youji_related():
             id) + ',"mddid":' + mddid + '}'
         req = requests.get(url=url, headers=headers)
         html = json.loads(req.text)['data']['html']
-        selector = fromstring(html)
-        li_list_mdd = selector.xpath('//ul[@class="gs_content"]/li')
         gonglve = []
-        li_index = 1
-        for li in li_list_mdd:
-            key = '1' + str(li_index)
-            title = li.xpath('a[@class="_j_mddrel_gl_item"]/@title')[0]
-            href = 'http://www.mafengwo.cn' + str(li.xpath('a[@class="_j_mddrel_gl_item"]/@href')[0])
-            src = li.xpath('a[@class="_j_mddrel_gl_item"]/img/@src')[0]
-            view = li.xpath('a[@class="_j_mddrel_gl_item"]/span/text()')[0]
-            gonglve.append({'key': key, 'title': title, 'href': href, 'view': view, 'src': src})
-            li_index = li_index + 1
+        if html !="":
+            selector = fromstring(html)
+            li_list_mdd = selector.xpath('//ul[@class="gs_content"]/li')
+            li_index = 1
+            for li in li_list_mdd:
+                key = '1' + str(li_index)
+                title = li.xpath('a[@class="_j_mddrel_gl_item"]/@title')[0]
+                href = 'http://www.mafengwo.cn' + str(li.xpath('a[@class="_j_mddrel_gl_item"]/@href')[0])
+                src = li.xpath('a[@class="_j_mddrel_gl_item"]/img/@src')[0]
+                view = li.xpath('a[@class="_j_mddrel_gl_item"]/span/text()')[0]
+                gonglve.append({'key': key, 'title': title, 'href': href, 'view': view, 'src': src})
+                li_index = li_index + 1
         url = 'https://pagelet.mafengwo.cn/note/pagelet/recNoteApi?params={"iid":' + str(id) + '}'
         req = requests.get(url=url, headers=headers)
         html = json.loads(req.text)['data']['html']
-        print(html)
-        selector = fromstring(html)
-        li_list_youji = selector.xpath('//ul[@class="gs_content"]/li')
         youji_list = []
-        li_index = 1
-        for li in li_list_youji:
-            key = '2' + str(li_index)
-            title = li.xpath('a[@class="_j_mddrel_gl_item"]/@title')[0]
-            href = 'http://www.mafengwo.cn' + str(li.xpath('a[@class="_j_mddrel_gl_item"]/@href')[0])
-            src = li.xpath('a[@class="_j_mddrel_gl_item"]/img/@src')[0]
-            view = li.xpath('a[@class="_j_mddrel_gl_item"]/span/text()')[0]
-            youji_list.append({'key': key, 'title': title, 'href': href, 'view': view, 'src': src})
-            li_index = li_index + 1
+        if html !="":
+            selector = fromstring(html)
+            li_list_youji = selector.xpath('//ul[@class="gs_content"]/li')
+            li_index = 1
+            for li in li_list_youji:
+                key = '2' + str(li_index)
+                title = li.xpath('a[@class="_j_mddrel_gl_item"]/@title')[0]
+                href = 'http://www.mafengwo.cn' + str(li.xpath('a[@class="_j_mddrel_gl_item"]/@href')[0])
+                src = li.xpath('a[@class="_j_mddrel_gl_item"]/img/@src')[0]
+                view = li.xpath('a[@class="_j_mddrel_gl_item"]/span/text()')[0]
+                youji_list.append({'key': key, 'title': title, 'href': href, 'view': view, 'src': src})
+                li_index = li_index + 1
         return json.dumps({'mdd': mdd, 'gonglve': gonglve, 'youji': youji_list, 'status': 200, 'args': 1},
                           ensure_ascii=False)
     except Exception as e:
