@@ -184,8 +184,8 @@ def login_success():
         if days > 0:
             daka = False
     return json.dumps({'status': 200, 'message': '登录成功', 'daka': daka, 'args': 1,
-                       'user': {'src': 'http://127.0.0.1:3333/uploads/' + user.img, 'coin': user.honey,
-                                'money': user.money}}, ensure_ascii=False)
+                       'user': {'src': 'http://127.0.0.1:3333/uploads/' + user.img, 'honey': user.honey,
+                                'coin': user.money}}, ensure_ascii=False)
 
 
 @app.route('/user_login', methods=['POST'])
@@ -789,7 +789,7 @@ def get_gong_lve():
         return json.dumps({'status': 500, 'message': '系统错误', 'args': 0})
 
 
-@app.route('/ziyouxing', methods=['GET'])
+@app.route('/ziyouxinggonglve', methods=['GET'])
 def ziyouxing():
     try:
         id = request.values.get('id')

@@ -152,3 +152,8 @@ db/db_class.py 可以实现全部删除表/创建表
 1.问答接口拆成三个
 
 2.用户默认图片bug修改
+# 2月27日更新
+## bug修改
+1.login_success 接口增加user的硬币和蜂蜜和图片信息
+
+2.ziyouxing接口更名为ziyouxinggonglve
