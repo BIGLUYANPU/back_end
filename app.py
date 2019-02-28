@@ -641,6 +641,47 @@ def get_home_new():
         return json.dumps({'status': 500, 'message': '系统错误', 'args': 0})
 
 
+@app.route('/youji_head', methods=['GET'])
+def get_youji_head():
+    try:
+        youji_id = request.values.get('id')
+        """
+        游记的头部解析
+        游记的出发时间 人均费用等解析
+        """
+        contentHead = parser_youji_head(youji_id)
+        app.logger.info('游记Head抓取')
+        # add_youji(str(contentHead), str(contentText), contentDetail)
+        return json.dumps(
+            {'status': 200, 'contentHead': contentHead, 'args': 1},
+            ensure_ascii=False)
+    except Exception as e:
+        app.logger.error('error:' + str(e))
+        return json.dumps({'status': 500, 'message': '系统错误', 'args': 0})
+
+
+@app.route('/youji_text', methods=['GET'])
+def get_youji_text():
+    try:
+        youji_id = request.values.get('id')
+        """
+        游记的头部解析
+        游记的出发时间 人均费用等解析
+        """
+        contentText = parser_youji_text(youji_id)
+        """
+        游记的正文部分解析
+        """
+        app.logger.info('游记正文开头内容(人物，时间)抓取')
+        # add_youji(str(contentHead), str(contentText), contentDetail)
+        return json.dumps(
+            {'status': 200, 'contentText': contentText, 'args': 1},
+            ensure_ascii=False)
+    except Exception as e:
+        app.logger.error('error:' + str(e))
+        return json.dumps({'status': 500, 'message': '系统错误', 'args': 0})
+
+
 @app.route('/youji', methods=['GET'])
 def get_youji():
     """
@@ -653,14 +694,6 @@ def get_youji():
     """
     try:
         youji_id = request.values.get('id')
-        """
-        游记的头部解析
-        游记的出发时间 人均费用等解析
-        """
-        contentHead, contentText = parser_youji_head_text(youji_id)
-        """
-        游记的正文部分解析
-        """
         contentDetail = ''
         data = ([], None)
         while True:
@@ -669,10 +702,9 @@ def get_youji():
             if data[1] == '':
                 break
         app.logger.info('游记内容抓取')
-        add_youji(str(contentHead), str(contentText), contentDetail)
+        # add_youji(str(contentHead), str(contentText), contentDetail)
         return json.dumps(
-            {'status': 200, 'contentHead': contentHead, 'contentText': contentText, 'contentDetail': contentDetail,
-             'args': 1},
+            {'status': 200, 'contentDetail': contentDetail, 'args': 1},
             ensure_ascii=False)
     except Exception as e:
         app.logger.error('error:' + str(e))
@@ -789,14 +821,49 @@ def get_gong_lve():
         return json.dumps({'status': 500, 'message': '系统错误', 'args': 0})
 
 
+@app.route('/ziyouxinggonglver', methods=['GET'])
+def ziyouxingr():
+    try:
+        id = request.values.get('id')
+        ziyouxingr = ziyouxingr_parser(id)
+        app.logger.info('message:' + 'ziyouxing')
+        return json.dumps({'status': 200, 'ziyouxingr': ziyouxingr, 'args': 1}, ensure_ascii=False)
+    except Exception as e:
+        app.logger.info('error:' + str(e))
+        return json.dumps({'status': 500, 'message': '系统错误', 'args': 0})
+
+
+@app.route('/ziyouxinggonglvel', methods=['GET'])
+def ziyouxingl():
+    try:
+        id = request.values.get('id')
+        ziyouxingl = ziyouxingl_parser(id)
+        app.logger.info('message:' + 'ziyouxing')
+        return json.dumps({'status': 200, 'ziyouxingl': ziyouxingl, 'args': 1}, ensure_ascii=False)
+    except Exception as e:
+        app.logger.info('error:' + str(e))
+        return json.dumps({'status': 500, 'message': '系统错误', 'args': 0})
+
+
+@app.route('/ziyouxinggonglve_related', methods=['GET'])
+def ziyouxing_related():
+    try:
+        id = request.values.get('id')
+        ziyouxing_related = ziyouxing_related_parser(id)
+        app.logger.info('message:' + 'ziyouxing')
+        return json.dumps({'status': 200, 'ziyouxing_related': ziyouxing_related, 'args': 1}, ensure_ascii=False)
+    except Exception as e:
+        app.logger.info('error:' + str(e))
+        return json.dumps({'status': 500, 'message': '系统错误', 'args': 0})
+
+
 @app.route('/ziyouxinggonglve', methods=['GET'])
 def ziyouxing():
     try:
         id = request.values.get('id')
-        location, ziyouxingl, ziyouxingr, ziyouxing_related = ziyouxing_parser(id)
+        location = ziyouxing_location_parser(id)
         app.logger.info('message:' + 'ziyouxing')
-        return json.dumps({'status': 200, 'ziyouxingl': ziyouxingl, 'location': location, 'ziyouxingr': ziyouxingr,
-                           'ziyouxing_related': ziyouxing_related, 'args': 1}, ensure_ascii=False)
+        return json.dumps({'status': 200, 'location': location, 'args': 1}, ensure_ascii=False)
     except Exception as e:
         app.logger.info('error:' + str(e))
         return json.dumps({'status': 500, 'message': '系统错误', 'args': 0})

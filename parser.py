@@ -496,7 +496,7 @@ def get_head_parser(url, headers):
         print(1)
 
 
-def parser_youji_head_text(id):
+def parser_youji_head(id):
     try:
         url = 'http://www.mafengwo.cn/i/' + id + '.html'
         headers = {
@@ -510,7 +510,6 @@ def parser_youji_head_text(id):
             'Referer': 'http://www.mafengwo.cn/'
         }
         contentHead = {}
-        contentText = {}
         req = requests.get(url, headers=headers)
         req.encoding = 'utf-8'
         selector = fromstring(req.text)
@@ -518,21 +517,6 @@ def parser_youji_head_text(id):
         contentHead['title_img_url'] = title_img_url
         content_title = selector.xpath('//div[@class="vi_con"]/h1/text()')[0]
         contentHead['content_title'] = content_title
-        time = '' if len(selector.xpath(
-            '//div[@class="tarvel_dir_list clearfix"]/ul/li[@class="time"]/text()')) == 0 else selector.xpath(
-            '//div[@class="tarvel_dir_list clearfix"]/ul/li[@class="time"]/text()')
-        day = '' if len(selector.xpath('//div[@class="tarvel_dir_list clearfix"]/ul/li[@class="day"]/text()')) == 0 else \
-            selector.xpath('//div[@class="tarvel_dir_list clearfix"]/ul/li[@class="day"]/text()')[1]
-        people = '' if len(
-            selector.xpath('//div[@class="tarvel_dir_list clearfix"]/ul/li[@class="people"]/text()')) == 0 else \
-            selector.xpath('//div[@class="tarvel_dir_list clearfix"]/ul/li[@class="people"]/text()')[1]
-        cost = '' if len(
-            selector.xpath('//div[@class="tarvel_dir_list clearfix"]/ul/li[@class="cost"]/text()')) == 0 else \
-            selector.xpath('//div[@class="tarvel_dir_list clearfix"]/ul/li[@class="cost"]/text()')[1]
-        contentText['time'] = time
-        contentText['day'] = day
-        contentText['people'] = people
-        contentText['cost'] = cost
         url = 'http://pagelet.mafengwo.cn/note/pagelet/headOperateApi?params={"iid":' + str(id) + '}'
         headers = {
             'Host': 'pagelet.mafengwo.cn',
@@ -569,7 +553,44 @@ def parser_youji_head_text(id):
         contentHead['vnum_share'] = vnum_share
         num_collect = selector.xpath('//a[@class="bs_btn _j_do_fav"]/span[1]/text()')[0]
         contentHead['num_collect'] = num_collect
-        return contentHead, contentText
+        return contentHead
+    except Exception as e:
+        print(e)
+
+
+def parser_youji_text(id):
+    try:
+        url = 'http://www.mafengwo.cn/i/' + id + '.html'
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36',
+            'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
+            'accept-encoding': 'gzip, deflate, br',
+            'accept-language': 'zh - CN, zh;q = 0.9',
+            'Cache-Control': 'no-cache',
+            'pragma': 'no-cache',
+            'Upgrade - Insecure - Requests': '1',
+            'Referer': 'http://www.mafengwo.cn/'
+        }
+        contentText = {}
+        req = requests.get(url, headers=headers)
+        req.encoding = 'utf-8'
+        selector = fromstring(req.text)
+        time = '' if len(selector.xpath(
+            '//div[@class="tarvel_dir_list clearfix"]/ul/li[@class="time"]/text()')) == 0 else selector.xpath(
+            '//div[@class="tarvel_dir_list clearfix"]/ul/li[@class="time"]/text()')
+        day = '' if len(selector.xpath('//div[@class="tarvel_dir_list clearfix"]/ul/li[@class="day"]/text()')) == 0 else \
+            selector.xpath('//div[@class="tarvel_dir_list clearfix"]/ul/li[@class="day"]/text()')[1]
+        people = '' if len(
+            selector.xpath('//div[@class="tarvel_dir_list clearfix"]/ul/li[@class="people"]/text()')) == 0 else \
+            selector.xpath('//div[@class="tarvel_dir_list clearfix"]/ul/li[@class="people"]/text()')[1]
+        cost = '' if len(
+            selector.xpath('//div[@class="tarvel_dir_list clearfix"]/ul/li[@class="cost"]/text()')) == 0 else \
+            selector.xpath('//div[@class="tarvel_dir_list clearfix"]/ul/li[@class="cost"]/text()')[1]
+        contentText['time'] = time
+        contentText['day'] = day
+        contentText['people'] = people
+        contentText['cost'] = cost
+        return contentText
     except Exception as e:
         print(e)
 
@@ -708,7 +729,7 @@ def gonglve_content_parser_3():
     return {'gonglve_content': gonglve_content, 'gonglve_head': gonglve_head}
 
 
-def ziyouxing_parser(id):
+def ziyouxing_related_parser(id):
     try:
         url = 'https://www.mafengwo.cn/gonglve/ziyouxing/' + str(id) + '.html'
         headers = {
@@ -722,7 +743,52 @@ def ziyouxing_parser(id):
         req = requests.get(url=url, headers=headers)
         req.encoding = 'utf-8'
         html = fromstring(req.text)
-        location = html.xpath('//div[@class="crumb"]/a[2]/text()')[0]
+        ziyouxing_related = {}
+        gong_lve = []
+        mdd_id = html.xpath('//div[@class="crumb"]/a[2]/@href')[0].split('_')[1][:-1]
+        url = 'https://www.mafengwo.cn/gonglve/ziyouxing/detail/relation_guides?gid=' + id + '&mddid=+' + mdd_id
+        req = requests.get(url=url, headers=headers)
+        req.encoding = 'utf-8'
+        html = json.loads(req.text)['html']
+        selector = fromstring(html)
+        ul = selector.xpath('//ul[@class="bd clearfix"]/li')
+        li_index = 1
+        for li in ul:
+            key = li_index
+            related_title = li.xpath('a/@title')[0]
+            related_href = li.xpath('a/@href')[0]
+            related_src = li.xpath('a/div[@class="img"]/img/@src')[0]
+            related_p1 = li.xpath('a/div[@class="info"]/div/p[1]/text()')[0]
+            related_p2 = li.xpath('a/div[@class="info"]/div/p[2]/text()')[0]
+            gong_lve.append(
+                {'key': key, 'related_title': related_title, 'related_src': related_src, 'related_href': related_href,
+                 'related_p1': related_p1, 'related_p2': related_p2})
+            li_index = li_index + 1
+        ziyouxing_related['gong_lve'] = gong_lve
+
+        if len(selector.xpath('//a[@class="pro_more"]/@href')) != 0:
+            ziyouxing_related['more_href'] = selector.xpath('//a[@class="pro_more"]/@href')[0]
+        else:
+            ziyouxing_related['more_href'] = ''
+        return ziyouxing_related
+    except Exception as e:
+        print(e)
+
+
+def ziyouxingl_parser(id):
+    try:
+        url = 'https://www.mafengwo.cn/gonglve/ziyouxing/' + str(id) + '.html'
+        headers = {
+            'Host': 'www.mafengwo.cn',
+            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36',
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
+            'Cache-Control': 'no-cache',
+            'pragma': 'no-cache',
+            'Upgrade - Insecure - Requests': '1'
+        }
+        req = requests.get(url=url, headers=headers)
+        req.encoding = 'utf-8'
+        html = fromstring(req.text)
         ziyouxingl = {}
         title = html.xpath('//div[@class="l-topic"]/h1/text()')[0]
         read_num = html.xpath('//div[@class="sub-tit"]/span[1]/em/text()')[0]
@@ -757,6 +823,26 @@ def ziyouxing_parser(id):
         ziyouxingl['author_src'] = author_src
         ziyouxingl['author_name'] = author_name
         ziyouxingl['author_identity'] = author_identity
+        ziyouxingl['gonglveDetail'] = str(soup)
+        return ziyouxingl
+    except Exception as e:
+        print(e)
+
+
+def ziyouxingr_parser(id):
+    try:
+        url = 'https://www.mafengwo.cn/gonglve/ziyouxing/' + str(id) + '.html'
+        headers = {
+            'Host': 'www.mafengwo.cn',
+            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36',
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
+            'Cache-Control': 'no-cache',
+            'pragma': 'no-cache',
+            'Upgrade - Insecure - Requests': '1'
+        }
+        req = requests.get(url=url, headers=headers)
+        req.encoding = 'utf-8'
+        html = fromstring(req.text)
         ziyouxingr = {}
         selector = html.xpath('//div[@class="bar-sar clearfix"]')[0]
         comment_num = selector.xpath('a[@class="_j_goto_comment"]/em/text()')[0]
@@ -778,34 +864,27 @@ def ziyouxing_parser(id):
         ziyouxingr['zan_num'] = zan_num
         ziyouxingr['ding_num'] = ding_num
         ziyouxingr['catalogue'] = catalogue
-        ziyouxing_related = {}
-        gong_lve = []
-        mdd_id = html.xpath('//div[@class="crumb"]/a[2]/@href')[0].split('_')[1][:-1]
-        url = 'https://www.mafengwo.cn/gonglve/ziyouxing/detail/relation_guides?gid=' + id + '&mddid=+' + mdd_id
+        return ziyouxingr
+    except Exception as e:
+        print(e)
+
+
+def ziyouxing_location_parser(id):
+    try:
+        url = 'https://www.mafengwo.cn/gonglve/ziyouxing/' + str(id) + '.html'
+        headers = {
+            'Host': 'www.mafengwo.cn',
+            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36',
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
+            'Cache-Control': 'no-cache',
+            'pragma': 'no-cache',
+            'Upgrade - Insecure - Requests': '1'
+        }
         req = requests.get(url=url, headers=headers)
         req.encoding = 'utf-8'
-        html = json.loads(req.text)['html']
-        selector = fromstring(html)
-        ul = selector.xpath('//ul[@class="bd clearfix"]/li')
-        li_index = 1
-        for li in ul:
-            key = li_index
-            related_title = li.xpath('a/@title')[0]
-            related_href = li.xpath('a/@href')[0]
-            related_src = li.xpath('a/div[@class="img"]/img/@src')[0]
-            related_p1 = li.xpath('a/div[@class="info"]/div/p[1]/text()')[0]
-            related_p2 = li.xpath('a/div[@class="info"]/div/p[2]/text()')[0]
-            gong_lve.append(
-                {'key': key, 'related_title': related_title, 'related_src': related_src, 'related_href': related_href,
-                 'related_p1': related_p1, 'related_p2': related_p2})
-            li_index = li_index + 1
-        ziyouxing_related['gong_lve'] = gong_lve
-
-        if len(selector.xpath('//a[@class="pro_more"]/@href')) != 0:
-            ziyouxing_related['more_href'] = selector.xpath('//a[@class="pro_more"]/@href')[0]
-        else:
-            ziyouxing_related['more_href'] = ''
-        return location, ziyouxingl, ziyouxingr, ziyouxing_related
+        html = fromstring(req.text)
+        location = html.xpath('//div[@class="crumb"]/a[2]/text()')[0]
+        return location
     except Exception as e:
         print(e)
 
@@ -878,12 +957,7 @@ def wenda_new_parser():
             mdd_href = 'https://www.mafengwo.cn' + \
                        li.xpath('div[@class="container"]/div[@class="operate"]/div[@class="mdd"]/a/@href')[0]
             mdd = li.xpath('div[@class="container"]/div[@class="operate"]/div[@class="mdd"]/a/text()')[0]
-            comment_num = ''
-            if len(li.xpath(
-                    'div[@class="container"]/div[@class="operate"]/a[@class="reply-wait _j_filter_click"]')) != 0:
-                comment_num = ''
-            else:
-                comment_num = li.xpath('div[@class="container"]/div[@class="operate"]/span[@class="reply"]/text()')[0]
+            comment_num = li.xpath('div[@class="container"]/div[@class="operate"]/span[@class="browse"]/text()')[0]
             date = li.xpath('div[@class="container"]/div[@class="operate"]/span[@class="date"]/text()')[0]
             index = index + 1
             new_questions.append(
@@ -893,6 +967,7 @@ def wenda_new_parser():
         return new_questions
     except Exception as e:
         print(e)
+
 
 def wenda_wait_parser():
     try:
@@ -930,6 +1005,7 @@ def wenda_wait_parser():
             if len(li.xpath('div[@class="container"]/div[@class="identity"]/a/text()')) != 0:
                 if li.xpath('div[@class="container"]/div[@class="identity"]/a/text()')[0] == '指路人':
                     guide = True
+            comment_num = li.xpath('div[@class="container"]/div[@class="operate"]/span[@class="browse"]/text()')[0]
             # img_url = ''
             # if len(li.xpath('div[@class="container"]/div[@class="desc clearfix"]/a/img')) != 0:
             #     img_url = li.xpath('div[@class="container"]/div[@class="desc clearfix"]/a/img/@src')[0]
@@ -956,8 +1032,8 @@ def wenda_wait_parser():
             date = li.xpath('div[@class="container"]/div[@class="operate"]/span[@class="date"]/text()')[0]
             index = index + 1
             wait_questions.append(
-                {'key': key, 'date': date, 'comment_num': '', 'mdd': mdd, 'mdd_href': mdd_href,
-                 'zan_num': zan_num, 'tags': tags, 'abstract': abstract,'guide': guide,
+                {'key': key, 'date': date, 'comment_num': comment_num, 'mdd': mdd, 'mdd_href': mdd_href,
+                 'zan_num': zan_num, 'tags': tags, 'abstract': abstract, 'guide': guide,
                  'user_img': user_img, 'user_href': user_href, 'title': title, 'wenda_url': wenda_url})
         return wait_questions
     except Exception as e:
@@ -996,6 +1072,8 @@ def wenda_hot_parser():
             user_href = 'https://www.mafengwo.cn' + \
                         li.xpath('div[@class="container"]/div[@class="avatar"]/a/@href')[0]
             user_img = li.xpath('div[@class="container"]/div[@class="avatar"]/a/img/@src')[0]
+            user_name = li.xpath('div[@class="container"]/div[@class="user-info"]/a[1]/text()')[0]
+            user_lv = li.xpath('div[@class="container"]/div[@class="user-info"]/a[2]/text()')[0]
             guide = False
             if len(li.xpath('div[@class="container"]/div[@class="identity"]/a/text()')) != 0:
                 if li.xpath('div[@class="container"]/div[@class="identity"]/a/text()')[0] == '指路人':
@@ -1028,8 +1106,7 @@ def wenda_hot_parser():
             hot_questions.append(
                 {'key': key, 'date': date, 'comment_num': comment_num, 'mdd': mdd, 'mdd_href': mdd_href,
                  'zan_num': zan_num, 'tags': tags, 'abstract': abstract, 'img_url': img_url, 'guide': guide,
-                 'user_img': user_img, 'user_href': user_href, 'title': title, 'wenda_url': wenda_url})
-
+                 'user_img': user_img, 'user_name':user_name,'user_lv':user_lv,'user_href': user_href, 'title': title, 'wenda_url': wenda_url})
         return hot_questions
     except Exception as e:
         print(e)
@@ -1157,7 +1234,7 @@ def wenda_related_parser(id):
         req = requests.get(url=url, headers=headers)
         data = json.loads(req.text)['data']['html']
         activity = []
-        if data !="":
+        if data != "":
             html = fromstring(data)
             ul = html.xpath('//ul[@class="slide-img"]/li')
             activity_index = 1
@@ -1171,7 +1248,7 @@ def wenda_related_parser(id):
         req = requests.get(url=url, headers=headers)
         data = json.loads(req.text)['data']['html']
         related_questions = []
-        if data !="":
+        if data != "":
             html = fromstring(data)
             ul = html.xpath('//ul[@class="bd"]/li')
             related_index = 1

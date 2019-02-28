@@ -157,3 +157,10 @@ db/db_class.py 可以实现全部删除表/创建表
 1.login_success 接口增加user的硬币和蜂蜜和图片信息
 
 2.ziyouxing接口更名为ziyouxinggonglve
+# 2月28日更新
+## 优化
+1.自由行接口拆分成/ziyouxinggonglver  /ziyouxinggonglvel /ziyouxinggonglve /ziyouxinggonglve_related
+
+2.游记接口拆分成/youji_head /youji_text /youji /youji_related
+
+3.问答hot接口下 新增user_name和user_lv 字段 问答wait/new两个接口下 comment_num获取浏览数
