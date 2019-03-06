@@ -713,64 +713,12 @@ def get_youji():
 
 @app.route('/youji_related', methods=['GET'])
 def youji_related():
+    """
+    :return:游记右侧相关
+    """
     try:
         id = request.values.get('id')
-        url = 'https://pagelet.mafengwo.cn/note/pagelet/rightMddApi?params={"iid":' + str(id) + '}'
-        headers = {
-            'Host': 'pagelet.mafengwo.cn',
-            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36',
-            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
-            'Cache-Control': 'no-cache',
-            'pragma': 'no-cache',
-            'Upgrade - Insecure - Requests': '1'
-        }
-        req = requests.get(url=url, headers=headers)
-        html = json.loads(req.text)['data']['html']
-        selector = fromstring(html)
-        mdd = {}
-        title = selector.xpath('//div[@class="relation_mdd"]/a[@class="_j_mdd_stas"]/@title')[0]
-        href = 'http://www.mafengwo.cn' + str(
-            selector.xpath('//div[@class="relation_mdd"]/a[@class="_j_mdd_stas"]/@href')[0])
-        src = selector.xpath('//div[@class="mdd_info"]/a/img/@src')[0]
-        num = selector.xpath('//div[@class="pics_num clearfix"]/strong/text()')[0]
-        mdd['title'] = title
-        mdd['href'] = href
-        mdd['src'] = src
-        mdd['num'] = num
-        mddid = selector.xpath('//div[@class="pics_num clearfix"]/a/@href')[0].split('/')[-1].split('.')[0]
-        url = 'https://pagelet.mafengwo.cn/note/pagelet/relateNoteApi?params={"iid":' + str(
-            id) + ',"mddid":' + mddid + '}'
-        req = requests.get(url=url, headers=headers)
-        html = json.loads(req.text)['data']['html']
-        gonglve = []
-        if html != "":
-            selector = fromstring(html)
-            li_list_mdd = selector.xpath('//ul[@class="gs_content"]/li')
-            li_index = 1
-            for li in li_list_mdd:
-                key = '1' + str(li_index)
-                title = li.xpath('a[@class="_j_mddrel_gl_item"]/@title')[0]
-                href = 'http://www.mafengwo.cn' + str(li.xpath('a[@class="_j_mddrel_gl_item"]/@href')[0])
-                src = li.xpath('a[@class="_j_mddrel_gl_item"]/img/@src')[0]
-                view = li.xpath('a[@class="_j_mddrel_gl_item"]/span/text()')[0]
-                gonglve.append({'key': key, 'title': title, 'href': href, 'view': view, 'src': src})
-                li_index = li_index + 1
-        url = 'https://pagelet.mafengwo.cn/note/pagelet/recNoteApi?params={"iid":' + str(id) + '}'
-        req = requests.get(url=url, headers=headers)
-        html = json.loads(req.text)['data']['html']
-        youji_list = []
-        if html != "":
-            selector = fromstring(html)
-            li_list_youji = selector.xpath('//ul[@class="gs_content"]/li')
-            li_index = 1
-            for li in li_list_youji:
-                key = '2' + str(li_index)
-                title = li.xpath('a[@class="_j_mddrel_gl_item"]/@title')[0]
-                href = 'http://www.mafengwo.cn' + str(li.xpath('a[@class="_j_mddrel_gl_item"]/@href')[0])
-                src = li.xpath('a[@class="_j_mddrel_gl_item"]/img/@src')[0]
-                view = li.xpath('a[@class="_j_mddrel_gl_item"]/span/text()')[0]
-                youji_list.append({'key': key, 'title': title, 'href': href, 'view': view, 'src': src})
-                li_index = li_index + 1
+        mdd, gonglve, youji_list = parser_youji_related(id)
         return json.dumps({'mdd': mdd, 'gonglve': gonglve, 'youji': youji_list, 'status': 200, 'args': 1},
                           ensure_ascii=False)
     except Exception as e:
@@ -821,7 +769,7 @@ def get_gong_lve():
         return json.dumps({'status': 500, 'message': '系统错误', 'args': 0})
 
 
-@app.route('/ziyouxinggonglver', methods=['GET'])
+@app.route('/ziyouxinggonglve', methods=['GET'])
 def ziyouxingr():
     try:
         id = request.values.get('id')
