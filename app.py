@@ -769,7 +769,7 @@ def get_gong_lve():
         return json.dumps({'status': 500, 'message': '系统错误', 'args': 0})
 
 
-@app.route('/ziyouxinggonglve', methods=['GET'])
+@app.route('/ziyouxinggonglver', methods=['GET'])
 def ziyouxingr():
     try:
         id = request.values.get('id')
