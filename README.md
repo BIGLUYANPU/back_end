@@ -164,3 +164,9 @@ db/db_class.py 可以实现全部删除表/创建表
 2.游记接口拆分成/youji_head /youji_text /youji /youji_related
 
 3.问答hot接口下 新增user_name和user_lv 字段 问答wait/new两个接口下 comment_num获取浏览数
+# 3月6日更新
+## bug
+1./youji_related 接口500 页面更改 重新获取
+
+2./youji_text 时间重新获取
+
