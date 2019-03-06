@@ -873,7 +873,7 @@ def ziyouxingl_parser(id):
             author_name = html.xpath('//div[@class="in-t"]/span[@class="name"]/a/text()')[0].strip()
         author_src = html.xpath('//div[@class="author"]/a/img/@src')[0]
         author_identity = html.xpath('//div[@class="in-t"]/span[@class="rz"]/text()')[0]
-        author_introduction = '' if len(html.xpath('//div[@class="info"]/p'))!=0 else html.xpath('//div[@class="info"]/p/text()').strip()
+        author_introduction = '' if len(html.xpath('//div[@class="info"]/p'))==0 else html.xpath('//div[@class="info"]/p/text()').strip()
         gonglveDetail = etree.tostring(etree.HTML(req.text).xpath('//div[@class="_j_content"]')[0], encoding='utf-8',
                                        method='html').decode('utf-8')
         soup = BeautifulSoup(gonglveDetail, 'html.parser').contents[0]
