@@ -170,3 +170,9 @@ db/db_class.py 可以实现全部删除表/创建表
 
 2./youji_text 时间重新获取
 
+3./ziyouxinggonglvel 新增加author_introduction
+# 3月8号更新
+1./mdd 当季推荐title获取
+
+2.代码优化 资料完整度 爬取速度
+
