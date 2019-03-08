@@ -210,7 +210,7 @@ def destination_parser():
         }
         req = requests.get(url, headers=headers)
         req.raise_for_status()
-        req.encoding = req.apparent_encoding
+        req.encoding = 'utf-8'
         html = req.text.replace('\n', '')
         selector = etree.HTML(html)
         # result 第一个元素为头图信息
@@ -328,7 +328,7 @@ def destination_parser():
             div_tiles_hide_egg = tiles.xpath('div[contains(@class,"item")]')
             for div_tiles_hide in div_tiles_hide_egg:
                 src = div_tiles_hide.xpath('a/img/@src')[0]
-                title = div_tiles_hide.xpath('a/div/text()')
+                title = div_tiles_hide.xpath('a/div/text()')[0]
                 if len(title) == 0:
                     title = '更多'
                 div_tiles_col_list.append({'src': src, 'title': title})
@@ -685,7 +685,7 @@ def parser_youji_detail(id, seq=None):
     req = requests.get(url, headers=headers)
     try:
         req.raise_for_status()
-        req.encoding = req.apparent_encoding
+        req.encoding = 'utf-8'
         dict_data = json.loads(req.text)['data']
         has_more = dict_data['has_more']
         html = str(dict_data['html'])
