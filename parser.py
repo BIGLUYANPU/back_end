@@ -4,7 +4,7 @@ from bs4 import BeautifulSoup
 from bs4 import NavigableString, Comment, Tag
 import requests
 import json
-
+from datetime import datetime
 
 def gong_lve_parser():
     """
@@ -309,7 +309,10 @@ def destination_parser():
         req = requests.get(url, headers=headers)
         html = json.loads(req.text)['data']['html']
         selector = fromstring(html)
-        season_recommend = []
+        bool_list = [False,False,False,False,False,False,False,False,False,False,False,False]
+        this_month = datetime.now().month
+        bool_list[this_month-1] = True
+        season_recommend = [1,2,3,4,5,6,7,8,9,10,11,12]
         div_tiles_col_list = []
         div_tiles_col = selector.xpath('//div[@class="tiles"]/div[contains(@class,"item")]')
         for col in div_tiles_col:
@@ -319,22 +322,34 @@ def destination_parser():
             title = col.xpath('a/div/text()')
             if len(title) == 0:
                 title = '更多'
+            else:
+                title = title[0]
             div_tiles_col_list.append({'src': src, 'title': title})
-        season_recommend.append({'key': 1, 'detail': div_tiles_col_list})
+        season_recommend[this_month-1] = {'key': this_month, 'detail': div_tiles_col_list}
         div_tiles_col_list = []
-        tiles_hide_count = 2
+        this_month = 0
+        if bool_list[this_month] is True:
+            this_month = this_month + 1
         tiles_hide = selector.xpath('//div[@class="tiles hide"]')
         for tiles in tiles_hide:
             div_tiles_hide_egg = tiles.xpath('div[contains(@class,"item")]')
             for div_tiles_hide in div_tiles_hide_egg:
                 src = div_tiles_hide.xpath('a/img/@src')[0]
-                title = div_tiles_hide.xpath('a/div/text()')[0]
+                title = div_tiles_hide.xpath('a/div/text()')
                 if len(title) == 0:
                     title = '更多'
+                else:
+                    title = title[0]
                 div_tiles_col_list.append({'src': src, 'title': title})
-            season_recommend.append({'key': tiles_hide_count, 'detail': div_tiles_col_list})
+            season_recommend[this_month] = {'key': this_month+1, 'detail': div_tiles_col_list}
             div_tiles_col_list = []
-            tiles_hide_count = tiles_hide_count + 1
+            # 将已经添加的变为True
+            bool_list[this_month] = True
+            # 如果下个月已经是True了
+            if this_month != 11:
+                this_month = this_month + 1
+                if bool_list[this_month] is True:
+                    this_month = this_month + 1
         # 当季推荐解析完成
         result.append({'season_recommend': season_recommend})
         return result

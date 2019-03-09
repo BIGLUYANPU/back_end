@@ -344,15 +344,15 @@ def percent():
         return json.dumps({'status': 401, 'message': '重新登录', 'args': 0}, ensure_ascii=False)
     user = pickle.loads(user)
     count = 76
-    if user.name is not None:
+    if user.name is not None and user.name != '':
         count = count + 3
-    if user.city is not None:
+    if user.city is not None and user.city != '':
         count = count + 3
-    if user.birthday is not None:
+    if user.birthday is not None and user.birthday != '':
         count = count + 3
-    if user.introduction is not None:
+    if user.introduction is not None and user.introduction != '':
         count = count + 10
-    if user.img is not None:
+    if user.img is not None and user.img != '':
         count = count + 5
     return json.dumps({'status': 200, 'percentage': int(float('%.2f' % (count / 100)) * 100), 'args': 1},
                       ensure_ascii=False)
