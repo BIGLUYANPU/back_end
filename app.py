@@ -441,6 +441,7 @@ def img_up():
             return json.dumps({'status': 400, 'message': '图片支持jpg,jpeg,png', 'args': 0}, ensure_ascii=False)
         file.save('static/uploads/' + account + mode)
         update_user(user.user_id, {'img': account + mode})
+        session.pop('user')
         session['user'] = pickle.dumps(select_user(id=user.id))
         app.logger.info(account + '用户头像上传成功')
         return json.dumps({'status': 200, 'message': '上传成功', 'args': 1}, ensure_ascii=False)
@@ -456,8 +457,6 @@ def user_img():
     图片的命名方式为：账户名+jpg/png
     :return:
     """
-    # 允许的图片格式
-    mode_list = ['.jpg', '.png', '.jpeg']
     try:
         # 获取图片
         account = session.get('account')

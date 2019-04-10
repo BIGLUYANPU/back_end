@@ -1250,7 +1250,7 @@ def wenda_detail_parser(id):
         time = selector.xpath('//div[@class="pub-bar fr"]/span[@class="time"]/span/text()')[0]
         liulan_num = selector.xpath('//div[@class="q-operate clearfix"]/div[@class="fr"]/span[1]/text()')[0]
         guanzhu_num = selector.xpath('//div[@class="q-operate clearfix"]/div[@class="fr"]/span[2]/span/text()')[0]
-        num = ''
+        num = 0
         if len(selector.xpath('//div[@class="answer-wrap"]/div[@class="hd"]')) != 0:
             num = selector.xpath('//div[@class="answer-wrap"]/div[@class="hd"]/span/text()')[0]
         answer_list = []

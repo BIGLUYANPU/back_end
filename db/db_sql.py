@@ -102,14 +102,8 @@ def update_user(user_id, kwargs):
             user.introduction = kwargs['address']
         if kwargs.get('img') is not None:
             user.img = kwargs['img']
-        if kwargs.get('weibo') is not None:
-            user.weibo = kwargs['weibo']
-        if kwargs.get('qq') is not None:
-            user.qq = kwargs['qq']
         if kwargs.get('money') is not None:
             user.money = kwargs['money']
-        if kwargs.get('phone') is not None:
-            user.phone = kwargs['phone']
         if kwargs.get('honey') is not None:
             user.honey = kwargs['honey']
         session.add(user)
